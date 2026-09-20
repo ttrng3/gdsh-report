@@ -1,0 +1,66 @@
+name: GDSH monthly publish
+
+# 100% autonomy: mỗi tháng đọc file ngân sách mới nhất từ Google Drive (service account,
+# chỉ đọc), tính lại bằng build_auto.py, commit index.html + history.json -> GitHub Pages tự build.
+# Chạy tay bất kỳ lúc nào: tab Actions -> "GDSH monthly publish" -> Run workflow.
+
+on:
+  schedule:
+    - cron: '0 1 17 * *'      # 08:00 giờ Sài Gòn ngày 17 hằng tháng (UTC+7)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gdsh-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cài thư viện
+        run: pip install -r requirements.txt
+
+      - name: Ghi key service account (từ secret)
+        env:
+          GDRIVE_SA_KEY: ${{ secrets.GDRIVE_SA_KEY }}
+        run: printf '%s' "$GDRIVE_SA_KEY" > sa.json
+
+      - name: Tải file ngân sách mới nhất từ Drive
+        id: fetch
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: sa.json
+          GDSH_FOLDER_ID: ${{ secrets.GDSH_FOLDER_ID }}
+        run: |
+          python fetch_latest_budget.py | tee fetch.out
+          echo "period=$(grep '^PERIOD=' fetch.out | cut -d= -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Sinh dashboard (có guard đối chiếu)
+        env:
+          GDSH_XLSX: budget.xlsx
+          GDSH_PERIOD: ${{ steps.fetch.outputs.period }}
+        run: python build_auto.py
+
+      - name: Xoá secret & file tạm
+        if: always()
+        run: rm -f sa.json budget.xlsx fetch.out
+
+      - name: Commit nếu có thay đổi
+        run: |
+          git config user.name  "GDSH Cloud Publisher"
+          git config user.email "ttrng3@users.noreply.github.com"
+          git add index.html history.json
+          if git diff --cached --quiet; then
+            echo "Không có thay đổi — bỏ qua."
+          else
+            git commit -m "GDSH auto-refresh kỳ ${{ steps.fetch.outputs.period }} [skip ci]"
+            git push
+          fi
