@@ -1,0 +1,9 @@
+{
+ "generatedUtc": "2026-09-20T00:00:00Z",
+ "asof": "31/08/2026",
+ "period": "08/2026",
+ "reviewAsOf": "18/09/2026",
+ "pages": "https://ttrng3.github.io/gdsh-report/",
+ "repo": "https://github.com/ttrng3/gdsh-report",
+ "note": "Seeded 2026-09-22 from the published page (kỳ 08.2026, sinh tự động 20/09/2026). build_auto.py overwrites this on every build."
+}

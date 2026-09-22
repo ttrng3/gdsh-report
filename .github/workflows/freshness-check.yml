@@ -1,10 +1,9 @@
-name: Dashboard freshness check
+name: Data freshness check
 
-# These dashboards fail silently. The mirror routine keeps "succeeding" while
-# publishing a stale file, or stops running entirely, and the page goes on
-# serving old numbers with a confident face — nobody finds out until someone
-# happens to look. This job looks every day and opens an issue when the
-# published page stops changing.
+# The dashboard's failure mode has never been a crash — it is silence. The
+# weekly refresh simply stops running and the page keeps serving old numbers
+# with a confident face. This job opens a GitHub issue when data/index.json
+# stops being updated, so a missed refresh is visible instead of invisible.
 on:
   schedule:
     - cron: "0 4 * * *"   # 11:00 Asia/Ho_Chi_Minh
@@ -15,47 +14,46 @@ permissions:
   issues: write
 
 env:
-  WATCH_PATH: index.html
-  MAX_AGE_DAYS: "10"
+  MAX_RUN_AGE_DAYS: 10
+  MAX_DATA_AGE_DAYS: 45
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - id: age
+      - name: Measure data age
+        id: age
         run: python3 .github/scripts/freshness.py >> "$GITHUB_OUTPUT"
 
-      - name: Open or update issue if stale
+      - name: Open issue if stale
         if: steps.age.outputs.stale == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          title="gdsh-report: ${{ steps.age.outputs.why }}"
+          existing=$(gh issue list --state open --label stale-data --json number --jq '.[0].number // empty')
           body=$(printf '%s\n' \
-            "\`${WATCH_PATH}\` has not changed in **${{ steps.age.outputs.days }} days** (last commit ${{ steps.age.outputs.last }})." \
+            "\`data/index.json\` was last generated **${{ steps.age.outputs.generated }}** (${{ steps.age.outputs.days }} days ago)." \
+            "Latest week published: **${{ steps.age.outputs.week }}**." \
             "" \
-            "Either the mirror routine stopped running, or it is running and republishing identical content." \
-            "Check the routine at https://claude.ai/code/routines and its most recent run." \
-            "" \
-            "Threshold: ${MAX_AGE_DAYS} days. Raise it in \`.github/workflows/freshness-check.yml\` if this dashboard is genuinely meant to update less often.")
-          n=$(gh issue list --state open --label stale-dashboard --json number --jq '.[0].number // empty')
-          if [ -n "$n" ]; then
-            gh issue comment "$n" --body "$body"
+            "The weekly refresh has not run. Check the scheduled routine, then re-run it." \
+            "Thresholds: run ${MAX_RUN_AGE_DAYS}d, data ${MAX_DATA_AGE_DAYS}d.")
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
           else
-            gh label create stale-dashboard --color B60205 --description "Published dashboard stopped updating" 2>/dev/null || true
-            gh issue create --title "Dashboard stale: ${WATCH_PATH} unchanged for ${{ steps.age.outputs.days }} days" --label stale-dashboard --body "$body"
+            gh label create stale-data --color B60205 --description "Dashboard data stopped refreshing" 2>/dev/null || true
+            gh issue create --title "$title" --label stale-data --body "$body"
           fi
 
-      - name: Close issue once fresh again
+      - name: Close issue if fresh again
         if: steps.age.outputs.stale == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          for n in $(gh issue list --state open --label stale-dashboard --json number --jq '.[].number'); do
-            gh issue close "$n" --comment "Fresh again — \`${WATCH_PATH}\` updated ${{ steps.age.outputs.last }}."
+          for n in $(gh issue list --state open --label stale-data --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Data is fresh again (${{ steps.age.outputs.generated }}, latest week ${{ steps.age.outputs.week }})."
           done

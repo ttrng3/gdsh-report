@@ -1,8 +1,12 @@
 name: GDSH monthly publish
 
 # 100% autonomy: mỗi tháng đọc file ngân sách mới nhất từ Google Drive (service account,
-# chỉ đọc), tính lại bằng build_auto.py, commit index.html + history.json -> GitHub Pages tự build.
+# chỉ đọc), tính lại bằng build_auto.py, commit index.html + history.json + data/ -> Pages.
 # Chạy tay bất kỳ lúc nào: tab Actions -> "GDSH monthly publish" -> Run workflow.
+#
+# Cảnh báo (2026-09-22): workflow này CHƯA từng chạy thành công vì repo KHÔNG có
+# secret nào. Bước "Preflight" bên dưới sẽ dừng sớm với thông báo rõ ràng thay vì
+# đổ stack trace ở bước tải Drive. Xem docs/gdsh-refresh.md để biết cách đặt secret.
 
 on:
   schedule:
@@ -21,6 +25,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Ghi nhịp TRƯỚC mọi thứ khác. Một tháng bị bỏ qua trong im lặng là chế độ
+      # hỏng nguy hiểm nhất ở đây — nhịp này làm nó hiện ra.
+      - name: Ghi nhịp (heartbeat)
+        run: |
+          mkdir -p data
+          printf '%s run=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "${{ github.run_id }}" > data/.last-check
+
+      - name: Preflight — kiểm tra secret
+        env:
+          HAS_KEY: ${{ secrets.GDRIVE_SA_KEY != '' }}
+        run: |
+          if [ "$HAS_KEY" != "true" ]; then
+            {
+              echo "### GDSH publish không chạy được — thiếu secret"
+              echo ""
+              echo '`GDRIVE_SA_KEY` chưa được đặt trong repo này.'
+              echo ""
+              echo "Cần đặt ở Settings → Secrets and variables → Actions:"
+              echo "- \`GDRIVE_SA_KEY\` — nội dung JSON key của service account (chỉ đọc Drive)"
+              echo "- \`GDSH_FOLDER_ID\` — (tuỳ chọn) ID thư mục ngân sách, để thu hẹp tìm kiếm"
+              echo ""
+              echo "Và phải share thư mục ngân sách trên Drive cho email của service account."
+              echo "Chi tiết: docs/gdsh-refresh.md"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Thiếu secret::GDRIVE_SA_KEY chưa đặt — xem Summary."
+            exit 1
+          fi
 
       - uses: actions/setup-python@v5
         with:
@@ -53,14 +85,34 @@ jobs:
         if: always()
         run: rm -f sa.json budget.xlsx fetch.out
 
+      - name: Ghi nhịp kèm kỳ đã thấy
+        run: |
+          printf '%s run=%s period=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            "${{ github.run_id }}" "${{ steps.fetch.outputs.period }}" > data/.last-check
+
       - name: Commit nếu có thay đổi
         run: |
           git config user.name  "GDSH Cloud Publisher"
           git config user.email "ttrng3@users.noreply.github.com"
-          git add index.html history.json
+          git add index.html history.json data/
           if git diff --cached --quiet; then
             echo "Không có thay đổi — bỏ qua."
           else
             git commit -m "GDSH auto-refresh kỳ ${{ steps.fetch.outputs.period }} [skip ci]"
             git push
+          fi
+
+      # Nhịp luôn được commit, kể cả khi không có kỳ mới — đó là bằng chứng job đã
+      # chạy, tách biệt với bằng chứng job đã xuất bản.
+      - name: Commit nhịp kể cả khi không đổi
+        if: always()
+        run: |
+          git config user.name  "GDSH Cloud Publisher"
+          git config user.email "ttrng3@users.noreply.github.com"
+          git add data/.last-check || true
+          if git diff --cached --quiet; then
+            echo "Nhịp không đổi."
+          else
+            git commit -m "heartbeat: GDSH publish run ${{ github.run_id }} [skip ci]"
+            git push || echo "push nhịp thất bại — không chặn job."
           fi

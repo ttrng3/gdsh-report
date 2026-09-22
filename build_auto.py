@@ -250,4 +250,21 @@ Nguồn: Tờ trình KHKD 27/05/2026 + Báo cáo sử dụng ngân sách {PER}. 
 _OUT=os.path.join(HERE,"index.html")
 with io.open(_OUT,"w",encoding="utf-8") as f:
     f.write(HTML)
+
+# Machine-readable clock beside the page. index.html carries the period only in
+# prose, which a watchdog cannot parse; this sidecar is what tells the freshness
+# check whether a new budget period was actually published, as opposed to the
+# job merely having run. Written on every build.
+_META = {
+    "generatedUtc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "asof": ASOF,
+    "period": PERIOD,
+    "reviewAsOf": REVIEW_ASOF,
+    "pages": "https://ttrng3.github.io/gdsh-report/",
+    "repo": "https://github.com/ttrng3/gdsh-report",
+}
+os.makedirs(os.path.join(HERE, "data"), exist_ok=True)
+with io.open(os.path.join(HERE, "data", "index.json"), "w", encoding="utf-8") as f:
+    json.dump(_META, f, ensure_ascii=False, indent=1)
+
 print("written", len(HTML), "chars ·", "kỳ", PER, "· lũy kế", ASOF)
