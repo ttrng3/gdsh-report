@@ -1,0 +1,61 @@
+name: Dashboard freshness check
+
+# These dashboards fail silently. The mirror routine keeps "succeeding" while
+# publishing a stale file, or stops running entirely, and the page goes on
+# serving old numbers with a confident face — nobody finds out until someone
+# happens to look. This job looks every day and opens an issue when the
+# published page stops changing.
+on:
+  schedule:
+    - cron: "0 4 * * *"   # 11:00 Asia/Ho_Chi_Minh
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  WATCH_PATH: index.html
+  MAX_AGE_DAYS: "10"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: age
+        run: python3 .github/scripts/freshness.py >> "$GITHUB_OUTPUT"
+
+      - name: Open or update issue if stale
+        if: steps.age.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          body=$(printf '%s\n' \
+            "\`${WATCH_PATH}\` has not changed in **${{ steps.age.outputs.days }} days** (last commit ${{ steps.age.outputs.last }})." \
+            "" \
+            "Either the mirror routine stopped running, or it is running and republishing identical content." \
+            "Check the routine at https://claude.ai/code/routines and its most recent run." \
+            "" \
+            "Threshold: ${MAX_AGE_DAYS} days. Raise it in \`.github/workflows/freshness-check.yml\` if this dashboard is genuinely meant to update less often.")
+          n=$(gh issue list --state open --label stale-dashboard --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then
+            gh issue comment "$n" --body "$body"
+          else
+            gh label create stale-dashboard --color B60205 --description "Published dashboard stopped updating" 2>/dev/null || true
+            gh issue create --title "Dashboard stale: ${WATCH_PATH} unchanged for ${{ steps.age.outputs.days }} days" --label stale-dashboard --body "$body"
+          fi
+
+      - name: Close issue once fresh again
+        if: steps.age.outputs.stale == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for n in $(gh issue list --state open --label stale-dashboard --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Fresh again — \`${WATCH_PATH}\` updated ${{ steps.age.outputs.last }}."
+          done
