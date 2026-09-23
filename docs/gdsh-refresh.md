@@ -86,8 +86,11 @@ The chain is **repo-first**, the same shape the other dashboards use:
     schedule → cloud routine → source → GitHub → Pages → artifact mirrored after
 
 **The repo is the source of truth and Pages is the live surface.** The artifact
-at https://claude.ai/artifact/CLL6FkexkoiRZ1iRL176NK is a **mirror**, published *after* the repo
-is correct, and it is never authoritative. If the two disagree, the repo wins
+is a **mirror**, published *after* the repo is correct, and never authoritative.
+**Its URL is not recorded here on purpose.** The Pages link above is this page's
+address; a claude.ai artifact link would be a second address for the same thing,
+and a private one most readers of this repo could not open anyway. The routine
+prompt holds the target URL, because that is the only place that needs it. If the two disagree, the repo wins
 and the artifact is what gets corrected.
 
 Order, every refresh:
