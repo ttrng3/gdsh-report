@@ -79,36 +79,15 @@ repo secret; the routine path uses the GitHub MCP tools. Never echo or commit
 a token. `sa.json`, `budget.xlsx` and `fetch.out` are gitignored and deleted by
 the workflow's cleanup step, which runs `if: always()`.
 
-## Artifact mirror
+## One surface, on purpose
 
-The chain is **repo-first**, the same shape the other dashboards use:
+    schedule → cloud routine → source → GitHub → Pages
 
-    schedule → cloud routine → source → GitHub → Pages → artifact mirrored after
+**GitHub Pages is the only published surface.** Ty ruled on 2026-09-23 that he
+wants control over what exists of his work, so there is no claude.ai artifact
+copy of this dashboard: the Pages URL above is the address, full stop.
 
-**The repo is the source of truth and Pages is the live surface.** The artifact
-is a **mirror**, published *after* the repo is correct, and never authoritative.
-**Its URL is not recorded here on purpose.** The Pages link above is this page's
-address; a claude.ai artifact link would be a second address for the same thing,
-and a private one most readers of this repo could not open anyway. The routine
-prompt holds the target URL, because that is the only place that needs it. If the two disagree, the repo wins
-and the artifact is what gets corrected.
-
-Order, every refresh:
-
-1. Write and verify the repo first. Do not touch the artifact until `main` has
-   moved and you have read the commit back.
-2. **This page is NOT a thin renderer.** `build_auto.py` bakes the numbers into
-   `index.html`, which fetches nothing at runtime, so the mirror is the page
-   itself — publish the fragment every refresh. `data/index.json` is metadata
-   about the build, not the page's data source.
-3. Publish the page with `tools/build-fragment.py` output, never `index.html`
-   itself — the artifact service wraps what you give it, so a complete document
-   nests inside another, the inner `<head>` is discarded, and the page renders
-   **blank with no console error**. Read the artifact's `index.html` back and
-   count `<html>` tags to check: two means it nested.
-4. **A failed mirror must never make you undo or retry the repo write.** Report
-   it and stop; the site is already correct.
-
-On 2026-09-23 the TMDV artifact was found *ahead* of its repo and the ECOPM one
-a whole renderer generation *behind*, neither caught by the freshness guards.
-Repo-first ordering is what keeps that from recurring.
+A mirror artifact existed for a few hours that day and was deleted. Do not
+recreate one, and do not add an artifact URL to this repo. `tools/build-fragment.py`
+is kept only because it is the one thing that can derive a standalone fragment
+of this page if it is ever needed; nothing in the refresh calls it.
