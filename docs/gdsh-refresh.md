@@ -78,3 +78,34 @@ No PAT in this tree, and none on Drive is used. The Actions path uses the
 repo secret; the routine path uses the GitHub MCP tools. Never echo or commit
 a token. `sa.json`, `budget.xlsx` and `fetch.out` are gitignored and deleted by
 the workflow's cleanup step, which runs `if: always()`.
+
+## Artifact mirror
+
+The chain is **repo-first**, the same shape the other dashboards use:
+
+    schedule → cloud routine → source → GitHub → Pages → artifact mirrored after
+
+**The repo is the source of truth and Pages is the live surface.** The artifact
+at https://claude.ai/artifact/CLL6FkexkoiRZ1iRL176NK is a **mirror**, published *after* the repo
+is correct, and it is never authoritative. If the two disagree, the repo wins
+and the artifact is what gets corrected.
+
+Order, every refresh:
+
+1. Write and verify the repo first. Do not touch the artifact until `main` has
+   moved and you have read the commit back.
+2. **This page is NOT a thin renderer.** `build_auto.py` bakes the numbers into
+   `index.html`, which fetches nothing at runtime, so the mirror is the page
+   itself — publish the fragment every refresh. `data/index.json` is metadata
+   about the build, not the page's data source.
+3. Publish the page with `tools/build-fragment.py` output, never `index.html`
+   itself — the artifact service wraps what you give it, so a complete document
+   nests inside another, the inner `<head>` is discarded, and the page renders
+   **blank with no console error**. Read the artifact's `index.html` back and
+   count `<html>` tags to check: two means it nested.
+4. **A failed mirror must never make you undo or retry the repo write.** Report
+   it and stop; the site is already correct.
+
+On 2026-09-23 the TMDV artifact was found *ahead* of its repo and the ECOPM one
+a whole renderer generation *behind*, neither caught by the freshness guards.
+Repo-first ordering is what keeps that from recurring.
