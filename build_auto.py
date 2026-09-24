@@ -252,7 +252,7 @@ Nguồn / Source: Tờ trình KHKD 27/05/2026 + Báo cáo sử dụng ngân sác
 
 {card("5 câu hỏi 'xoáy' cho buổi bảo vệ kế hoạch / 5 hard questions for the plan defense", "Lớp người duyệt — bộ câu hỏi để ép quản lý ra bằng chứng, không phải lời hứa. Reviewer layer: forces evidence, not promises.", chr(10)+jblock("questions"))}
 
-<div class="foot">Báo cáo phân tích nội bộ · số liệu kỳ {PER} (lũy kế {ASOF}) · sinh tự động {TODAY}. Con số tài chính tính lại bằng code từ file ngân sách nguồn, có guard đối chiếu mốc Kế hoạch (tờ trình 27/05) và đẳng thức P&L. #2 cơ cấu OPEX (dòng có tên từ Báo cáo DT-CP, "Khác" = tổng OPEX − các dòng đã nêu); #3 % thực thu/KH năm; #4 biên gộp KH vs TH (kẹp trần −160%); #8 kịch bản cả năm là lớp phán quyết (rà soát thủ công). Không phải tư vấn pháp lý/thuế.</div>
+<div class="foot">Báo cáo phân tích nội bộ · số liệu kỳ {PER} (lũy kế {ASOF}) · sinh tự động {TODAY}. Con số tài chính tính lại bằng code từ file ngân sách nguồn, có guard đối chiếu mốc Kế hoạch (tờ trình 27/05) và đẳng thức P&L. #2 cơ cấu OPEX (dòng có tên từ Báo cáo DT-CP, "Khác" = tổng OPEX − các dòng đã nêu); #3 % thực thu/KH năm; #4 biên gộp KH vs TH (kẹp trần: biên TH −200%, biên KH −40%); #8 kịch bản cả năm là lớp phán quyết (rà soát thủ công). Không phải tư vấn pháp lý/thuế.</div>
 
 </div></body></html>"""
 
