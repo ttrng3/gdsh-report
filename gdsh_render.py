@@ -7,8 +7,8 @@ import html
 # text never sits in a raw fill — ink() returns the darker *_INK variant that
 # clears 4.5:1 on white. MUT is #6C6C70 (not HIG #8E8E93) to keep AA on 12px.
 BG="#F2F2F7"; PAPER="#FFFFFF"; SURF="#F2F2F7"; SUNK="#F2F2F7"; INK="#1C1C1E"; INKS="#3C3C43"
-MUT="#6C6C70"; RULE="#E5E5EA"; ACC="#007AFF"; ACCBG="#E8F1FE"; CRIT="#FF3B30"; WARN="#FF9500"
-ACC_INK="#0060DF"; CRIT_INK="#C4271D"; WARN_INK="#8A5200"
+MUT="#6C6C70"; RULE="#E5E5EA"; ACC="#007AFF"; ACCBG="#E0EFFF"; CRIT="#FF3B30"; WARN="#FF9500"
+ACC_INK="#0040DD"; CRIT_INK="#D70015"; WARN_INK="#8A5200"
 PLAN=ACC   # Kế hoạch = xanh (blue)
 ACT=CRIT   # Thực hiện = đỏ
 # Categorical fills for the OPEX donut (#2) — not the semantic four, so a slice
@@ -380,13 +380,6 @@ thead th{background:var(--surface);color:var(--ink-soft);font-weight:600}
 """
 
 # Dark values — SCREEN only; print always gets the light sheet.
-_DARK = ("--bg:#000000;--paper:#1C1C1E;--surface:#2C2C2E;--sunk:#2C2C2E;--rule:#38383A;"
-         "--ink:#FFFFFF;--ink-soft:#D1D1D6;--muted:#98989F;"
-         "--accent:#0A84FF;--accent-ink:#64B5FF;--accent-bg:rgba(10,132,255,.16);"
-         "--critical-fill:#FF453A;--critical:#FF6961;--warning-fill:#FF9F0A;--warning:#FFB340;"
-         "--c1:#5E5CE6;--c2:#BF5AF2;--c3:#40C8E0;--c4:#AC8E68;--c5:#98989D;--c6:#7C7C80;"
-         "--c7:#636366;--c8:#545458;--c9:#48484A;"
-         "--shadow-card:none;--shadow-float:0 8px 24px rgba(0,0,0,.5)")
 
 _APPLE_CSS = """
 /* ============================================================
@@ -423,5 +416,5 @@ def page_style():
     root = ":root{" + ";".join(f"{t}:{h}" for t,h in toks) + \
         ';--sans:-apple-system,BlinkMacSystemFont,"San Francisco","Helvetica Neue",Helvetica,Ubuntu,Roboto,"Segoe UI",sans-serif}'
     svgmap = "\n".join(f'svg [fill="{h}"]{{fill:var({t})}} svg [stroke="{h}"]{{stroke:var({t})}}' for h,t in SVG_TOKENS)
-    apple = _APPLE_CSS.replace("@DARK@", _DARK).replace("@SVGMAP@", svgmap)
+    apple = _APPLE_CSS.replace("@SVGMAP@", svgmap)
     return f"<style>\n{root}{_BASE_CSS}</style>\n<style id=\"apple-layer\">{apple}</style>"
