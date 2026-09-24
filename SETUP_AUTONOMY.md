@@ -5,7 +5,7 @@ mỗi tháng GitHub Actions đọc file ngân sách mới nhất từ Google Dri
 tính lại bằng `build_auto.py` (có guard đối chiếu), rồi commit `index.html` → GitHub Pages tự build.
 
 - Số liệu (chart #1–#7, KPI, bảng P&L, số trong note) **tự cập nhật** từ Excel.
-- Phán quyết / kịch bản #8 / Stage-Gate / 5 câu hỏi = **lớp người duyệt**, chỉ đổi khi Ty rà soát (sửa `REVIEW_ASOF` trong `build_auto.py`). Script không tự viết lại phán quyết.
+- Phán quyết / kịch bản #8 / Stage-Gate / 5 câu hỏi = **lớp người duyệt**, nằm trong `judgment/judgment.html`, chỉ đổi khi Ty rà soát (sửa file đó, kể cả `review_asof`). Script chỉ đọc, không tự viết lại phán quyết.
 
 ## Các file
 | File | Vai trò |
@@ -15,6 +15,7 @@ tính lại bằng `build_auto.py` (có guard đối chiếu), rồi commit `ind
 | `build_auto.py` | Sinh `index.html` từ Excel (+ cập nhật `history.json`) |
 | `gdsh_extract.py` | Trích số theo Mã dòng + **guard đối chiếu** |
 | `gdsh_render.py` | Hàm vẽ biểu đồ SVG + bảng màu (Ty Standard) |
+| `judgment/judgment.html` | Lớp phán quyết (verdict, đề xuất, kịch bản #8, Stage-Gate, 5 câu hỏi) — sửa tay |
 | `history.json` | Chuỗi lỗ P&L lũy kế từng tháng cho chart #5 |
 | `requirements.txt` | Thư viện Python |
 
@@ -51,7 +52,7 @@ Không phải làm gì. Kế toán bỏ file ngân sách tháng mới vào thư 
 Muốn chạy ngay: Actions → Run workflow.
 
 ## Khi muốn đổi phán quyết / kịch bản / câu hỏi
-Sửa phần literal trong `build_auto.py` (khối `c8` và các block `Stage-Gate` / `5 câu hỏi`) + cập nhật `REVIEW_ASOF`, commit. Đó là lớp người-duyệt, cố ý tách khỏi phần tự động.
+Sửa `judgment/judgment.html` (các block `verdict`, `scenarios`, `scenario_sub`, `stage_gate`, `questions`) + cập nhật block `review_asof`, commit. Hướng dẫn đầy đủ: `docs/gdsh-refresh.md`. Đó là lớp người-duyệt, cố ý tách khỏi phần tự động.
 
 ## Bảo mật (ghi cho KSNB)
 - Service account **chỉ đọc**, chỉ thấy **đúng một thư mục** được share; không đụng được phần còn lại của Drive.

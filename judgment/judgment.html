@@ -1,0 +1,77 @@
+<!--
+  GDSH — LỚP PHÁN QUYẾT / JUDGMENT LAYER.  Edited by hand; build_auto.py never writes it.
+
+  Everything on the page that is an OPINION lives here: the verdict, the
+  decision requested, the #8 full-year scenarios, the Stage-Gate plan and the
+  5 hard questions. Everything COMPUTED (charts #1-#7, KPIs, P&L table, chart
+  notes) lives in build_auto.py and follows the budget workbook on its own.
+
+  Each month, when a new budget period is published:
+    1. Re-read every block below against the new numbers.
+    2. Edit the prose if the story changed; update `scenarios` if you re-ran them.
+    3. Set `review_asof` to the date you reviewed (dd/mm/yyyy). The page prints
+       it next to the verdict, under #8 and under the Stage-Gate.
+
+  Format rules
+    * A block starts at a line `<!--@name-->` and runs to the next one. Keep the
+      names; the generator fails loudly if one is missing.
+    * `{name}` inserts a number computed from this month's workbook, formatted
+      the way the page shows it — so the prose never goes stale on a figure.
+      The full list is PLACEHOLDERS in build_auto.py; the ones used here:
+        {dt_pct} 2,5%   {cf_lk} −6,77 tỷ   {cf_lk_abs} 6,77   {cf_pct} 66
+        {months} 6   {surge_x} 24,6×   {surge_need_tr} 1.945   {t08_tr} 79
+        {tN} T8   {mm} 8   {be_mult} 3,4×   {capex_lk} 2,47 tỷ   {net_kh_1} −6,3
+        {summer_share} 46   {en_gp_kh} −0,54 tỷ   {en_cogs_kh} 2,93 tỷ
+        {en_rev_kh} 2,38 tỷ   {payroll_pct} 46   {ns_kh_share} 71,5%
+        {ns_lk_share} 75,1%   {payroll_rev_pct} 80   {rev_per_wage} 6,8
+      A literal brace must be written {{ or }}.
+    * Blocks are HTML: escape & as &amp; in prose (the Stage-Gate table's
+      "P&L" is left raw only because the published page had it that way).
+    * `scenarios`: one bar per line, `label ; value ; colour`. The label's `|`
+      breaks it onto two lines under the bar. value = net loss for the full
+      year in đồng, or `plan` for the plan's own loss (computed). colour =
+      blue (plan) | red (actual trajectory) | orange (mitigation).
+-->
+<!--@review_asof-->
+20/09/2026
+<!--@verdict-->
+<p class="lead">Phán quyết: KHÔNG mở rộng — Duy trì có điều kiện &amp; tái cấu trúc<br><span style="font-size:15px;font-weight:500">Verdict: do NOT expand — conditional maintain &amp; restructure</span></p>
+<p>Đơn vị chưa chứng minh cầu ở quy mô nền: doanh thu mới <b>{dt_pct} kế hoạch năm</b>, <b>lỗ gộp âm</b> (bán một đồng đang lỗ trực tiếp trước cả lương &amp; mặt bằng), đã đốt <b>{cf_lk}</b> tiền mặt ({cf_pct}% ngân sách) sau {months} tháng. Toàn bộ kế hoạch đặt cược vào cú hích cuối năm gấp <b>{surge_x}</b> run-rate hiện tại — chưa có hợp đồng/đăng ký làm bằng.<br><span style="color:var(--ink-soft)"><i>Demand unproven at base scale: revenue only {dt_pct} of plan, gross margin negative, {cf_lk} cash burned; the plan hinges on a {surge_x} Q4 surge with no signed pipeline behind it.</i></span></p>
+<p style="margin-top:12px;padding-top:12px;border-top:1px solid var(--accent)"><b>Đề xuất phê duyệt HÔM NAY / Decision requested today:</b> chấp thuận giai đoạn <b>duy trì – tái cấu trúc 90 ngày</b>, giải ngân theo <b>TRANCHE</b> qua 3 cổng kiểm soát (bên dưới). KHÔNG phê duyệt vốn mở rộng; KHÔNG giải ngân trọn gói. <i>Approve a 90-day maintain-&amp;-restructure phase, funded in tranches through 3 gates — not blanket funding, not expansion capital.</i></p>
+<!--@scenarios-->
+Lạc quan · Plan|(đúng KH)       ; plan          ; blue
+Cơ sở · Base|(giữ chi phí)      ; -8418236732   ; red
+Cắt OPEX 20% · Cut|(từ Cơ sở)   ; -6627951881   ; orange
+Xấu · Bad|(Q4 ~10%)             ; -8684830494   ; red
+<!--@scenario_sub-->
+Bốn kịch bản trên cùng một cơ sở 12 tháng: Kế hoạch (Lạc quan, xanh) so với các kịch bản theo quỹ đạo thực. Giữ chi phí lỗ nặng hơn kế hoạch; chỉ cắt giảm mới kéo về vùng đã duyệt.
+<!--@stage_gate-->
+<p style="margin-top:0"><b>KHÔNG mở rộng.</b> Phê duyệt một giai đoạn <b>duy trì – tái cấu trúc 90 ngày</b>, vốn giải ngân theo <b>TRANCHE</b> gắn với ba cổng kiểm soát. Không giải ngân trọn gói; mỗi cổng là điều kiện bắt buộc để mở tranche kế; trượt cổng kích hoạt phương án thu hẹp. Không đóng cửa (CAPEX {capex_lk} là chi phí chìm, Robotics đã chứng minh biên, và tiện ích giáo dục hỗ trợ giá trị BĐS) — nhưng cũng không nuôi một mô hình chưa chứng minh cầu.</p>
+<div style="overflow-x:auto"><table class="gate"><thead><tr><th>Cổng</th><th>Mục tiêu</th><th>Điều kiện KPI bắt buộc (đo được)</th><th>Mở khóa / Hệ quả</th></tr></thead><tbody>
+<tr><td>G1<br>0–30 ngày</td><td>Tái cấu trúc nền chi phí</td><td>• Biên chế điều chỉnh theo số lớp thực, cam kết bằng văn bản kéo lỗ kịch bản Cơ sở cả năm về vùng đã duyệt (≤ mốc kế hoạch)<br>• Phương án Tiếng Anh HĐ Anh đã trình (tái đàm phán phí / định giá lại / thu hẹp) kèm ngưỡng học viên hòa vốn gộp</td><td>Đạt → mở <b>tranche 2</b>. Trượt → dừng, không rót thêm</td></tr>
+<tr><td>G2<br>30–60 ngày</td><td>Chứng minh cầu thật</td><td>• Ngân sách tạo cầu nâng từ mức giải ngân hiện tại lên mức chốt; báo cáo phễu hàng tuần<br>• Số học viên khóa học TRẢ PHÍ (không tính lượt trải nghiệm) ≥ ngưỡng đầu năm học BLĐ chốt<br>• Run-rate DT tháng ≥ 3–4× tháng gần nhất, có hợp đồng/đăng ký làm bằng</td><td>Đạt → mở <b>tranche 3</b>. Trượt → thu hẹp</td></tr>
+<tr><td>G3<br>60–90 ngày</td><td>Chứng minh mô hình</td><td>• Biên gộp toàn đơn vị <b>DƯƠNG</b><br>• Lỗ P&L quy năm về vùng kế hoạch<br>• Công suất lấp đầy khung giờ vàng đạt ngưỡng</td><td>Đạt cả 3 → xét <b>MỞ RỘNG</b> trên dữ liệu thật. Trượt → <b>DỪNG LỖ</b>, thu về lõi Robotics/STEM</td></tr>
+</tbody></table></div>
+<!--@questions-->
+<div class="qbox">
+<div class="q"><span class="qh">Hôm nay có chính xác bao nhiêu HỌC VIÊN KHÓA HỌC ĐÃ TRẢ PHÍ (không tính 8.800 lượt trải nghiệm 60k), tách theo từng dòng?</span>
+<span class="qm"><b>Dữ liệu ép:</b> doanh thu {dt_pct} KH; nguồn thu thực {summer_share}% đến từ Trại hè (một lần), Robotics/Văn hóa định kỳ gần như chưa chạy.</span>
+<span class="qm"><b>Trả lời tốt phải có:</b> số học viên trả phí theo từng khóa + tỷ lệ tái đăng ký; con số đó biện minh cho mở rộng thay vì lấp đầy chỗ trống thế nào.</span>
+<span class="qm"><b>Bẫy cần tránh:</b> gộp lượt trải nghiệm vào "học sinh" để làm đẹp con số.</span></div>
+<div class="q"><span class="qh">Q4 phải tạo {surge_need_tr} triệu/tháng — gấp {surge_x} tháng {mm}. Phễu cụ thể nào chứng minh, hay phải viết lại kế hoạch xuống thực tế?</span>
+<span class="qm"><b>Dữ liệu ép:</b> run-rate {tN} = {t08_tr} triệu; công trình chậm đã cắt mất thời gian vàng tuyển sinh hè + đầu năm học.</span>
+<span class="qm"><b>Trả lời tốt phải có:</b> số lead, tỷ lệ chuyển đổi từng tầng, hợp đồng/đăng ký đã ký cho Q4.</span>
+<span class="qm"><b>Bẫy cần tránh:</b> hứa ramp bằng "sẽ đẩy mạnh marketing" mà không có phễu số liệu.</span></div>
+<div class="q"><span class="qh">Tiếng Anh HĐ Anh đóng góp gộp {en_gp_kh} theo thiết kế. Phí nhượng quyền cố định hay theo đầu học viên? Ở mức tuyển sinh nào hết lỗ gộp — nếu không đạt, vì sao vẫn giữ?</span>
+<span class="qm"><b>Dữ liệu ép:</b> lực cản gộp DUY NHẤT của danh mục; giá vốn {en_cogs_kh} > doanh thu {en_rev_kh}.</span>
+<span class="qm"><b>Trả lời tốt phải có:</b> điều khoản hợp đồng HĐ Anh + điểm hòa vốn số học viên + phương án tái đàm phán.</span>
+<span class="qm"><b>Bẫy cần tránh:</b> giữ vì "thương hiệu" mà không có lộ trình hết lỗ.</span></div>
+<div class="q"><span class="qh">Nhân sự đã tiêu {payroll_pct}% quỹ lương năm gần như không lớp, cơ cấu chi trôi về lương ({ns_kh_share}→{ns_lk_share}). Định biên phục vụ bao nhiêu lớp thực / bao nhiêu lớp kế hoạch? Cắt được bao nhiêu, bao giờ?</span>
+<span class="qm"><b>Dữ liệu ép:</b> lương = {ns_kh_share} chi phí, ~{payroll_rev_pct}% doanh thu kế hoạch; năng suất {rev_per_wage} xu doanh thu/đồng lương.</span>
+<span class="qm"><b>Trả lời tốt phải có:</b> bảng định biên theo lớp thực, mức cắt được và mốc hiệu lực.</span>
+<span class="qm"><b>Bẫy cần tránh:</b> "cần giữ người chờ ramp" mà không định lượng chi phí chờ.</span></div>
+<div class="q"><span class="qh">Giữ nguyên chi phí, kịch bản khả dĩ nhất lỗ −8,4 tỷ (nặng hơn kế hoạch) và cạn vốn điều lệ 10 tỷ trong năm. Cần bơm thêm bao nhiêu, và phương án đưa lỗ về vùng đã duyệt TRƯỚC KHI xin tiền mở rộng là gì?</span>
+<span class="qm"><b>Dữ liệu ép:</b> đã đốt {cf_lk_abs}/10 tỷ vốn điều lệ; hòa vốn cần gấp {be_mult} doanh thu.</span>
+<span class="qm"><b>Trả lời tốt phải có:</b> nhu cầu vốn định lượng + lộ trình cắt chi phí đưa lỗ ≤ {net_kh_1} tỷ.</span>
+<span class="qm"><b>Bẫy cần tránh:</b> xin vốn mở rộng khi nền lỗ chưa được kiểm soát.</span></div>
+</div>

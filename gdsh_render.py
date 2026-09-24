@@ -53,7 +53,9 @@ def grouped_bars(series, cats, colors, unit="tỷ", w=820, h=360, maxv=None):
             v=arr[ci]; bh=v/mx*plot_h; x=gx+si*bw; y=pad_t+plot_h-bh
             s.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw*0.9:.1f}" height="{bh:.1f}" fill="{colors[si]}"/>')
             s.append(f'<text x="{x+bw*0.45:.1f}" y="{y-4:.1f}" text-anchor="middle" font-size="10.5" fill="{INKS}" style="font-variant-numeric:tabular-nums">{bn(v)}</text>')
-        s.append(f'<text x="{pad_l+ci*gw+gw/2:.1f}" y="{h-pad_b+18:.1f}" text-anchor="middle" font-size="12" fill="{INK}">{esc(cat)}</text>')
+        vn,_,en=cat.partition("|")         # "Doanh thu|Revenue" -> second, smaller line
+        s.append(f'<text x="{pad_l+ci*gw+gw/2:.1f}" y="{h-pad_b+18:.1f}" text-anchor="middle" font-size="12" fill="{INK}">{esc(vn)}</text>')
+        if en: s.append(f'<text x="{pad_l+ci*gw+gw/2:.1f}" y="{h-pad_b+32:.1f}" text-anchor="middle" font-size="9.5" fill="{MUT}">{esc(en)}</text>')
     lx=pad_l; ly=h-18
     for si,(lab,_) in enumerate(series):
         s.append(f'<rect x="{lx}" y="{ly-9}" width="12" height="12" fill="{colors[si]}"/>')
@@ -174,7 +176,9 @@ def gmargin(rows, w=820, LMIN=-160, RMAX=80):
     s.append('</svg>'); return "".join(s)
 
 # ---------- two cumulative lines: actual vs plan ----------
-def line2(actual, plan, w=980, h=420, unit="tỷ"):
+def line2(actual, plan, w=980, h=420, unit="tỷ",
+          plan_lab="Kế hoạch / Budget (phân bổ đều)", act_lab="Thực hiện / Actual",
+          foot="Lỗ P&L lũy kế / Cumulative loss"):
     pad_l=66; pad_r=22; pad_t=44; pad_b=60
     plot_w=w-pad_l-pad_r; plot_h=h-pad_t-pad_b
     mx=max(max(abs(v) for _,v in actual), max(abs(v) for _,v in plan))*1.1
@@ -196,9 +200,9 @@ def line2(actual, plan, w=980, h=420, unit="tỷ"):
         s.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="{ACT}"/>')
         s.append(f'<text x="{x:.1f}" y="{y+21:.1f}" text-anchor="middle" font-size="14" font-weight="600" fill="{ink(ACT)}" style="font-variant-numeric:tabular-nums">{v/1e9:.2f}</text>')
         s.append(f'<text x="{x:.1f}" y="{h-26:.1f}" text-anchor="middle" font-size="15" fill="{INK}">{esc(lab)}</text>')
-    s.append(f'<rect x="{pad_l}" y="12" width="20" height="5" fill="{PLAN}"/><text x="{pad_l+28}" y="21" font-size="14" fill="{INKS}">Kế hoạch (mốc T3–T8, phân bổ đều)</text>')
-    s.append(f'<rect x="{pad_l+360}" y="12" width="20" height="5" fill="{ink(ACT)}"/><text x="{pad_l+388}" y="21" font-size="14" fill="{INKS}">Thực hiện</text>')
-    s.append(f'<text x="{w-pad_r}" y="{h-6}" text-anchor="end" font-size="12.5" fill="{MUT}">Lỗ P&L lũy kế · ĐVT: {unit} VNĐ</text>')
+    s.append(f'<rect x="{pad_l}" y="12" width="20" height="5" fill="{PLAN}"/><text x="{pad_l+28}" y="21" font-size="14" fill="{INKS}">{esc(plan_lab)}</text>')
+    s.append(f'<rect x="{pad_l+300}" y="12" width="20" height="5" fill="{ACT}"/><text x="{pad_l+328}" y="21" font-size="14" fill="{INKS}">{esc(act_lab)}</text>')
+    s.append(f'<text x="{w-pad_r}" y="{h-6}" text-anchor="end" font-size="12.5" fill="{MUT}">{foot} · ĐVT: {unit} VNĐ</text>')
     s.append('</svg>'); return "".join(s)
 
 # ---------- simple labeled vertical bars (charts 6,7,8) ----------
@@ -218,7 +222,7 @@ def vbars(rows, w=760, h=300, unit="", note=""):
     if note: s.append(f'<text x="{w-6}" y="{h-6}" text-anchor="end" font-size="10.5" fill="{MUT}">{esc(note)}</text>')
     s.append('</svg>'); return "".join(s)
 
-def loss_bars(rows, w=820, h=340):
+def loss_bars(rows, w=820, h=340, foot="Lỗ ròng / Net loss"):
     pad_l=16; pad_r=16; pad_t=40; pad_b=74; plot_w=w-pad_l-pad_r; plot_h=h-pad_t-pad_b
     mx=max(abs(v) for _,v,_ in rows)*1.12
     n=len(rows); gw=plot_w/n; bw=gw*0.5
@@ -229,11 +233,11 @@ def loss_bars(rows, w=820, h=340):
         s.append(f'<text x="{x+bw/2:.1f}" y="{y-8:.1f}" text-anchor="middle" font-size="14" font-weight="600" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{v/1e9:.2f}</text>')
         for k,wd in enumerate(lab.split("|")):
             s.append(f'<text x="{x+bw/2:.1f}" y="{h-pad_b+16+k*14:.1f}" text-anchor="middle" font-size="11" fill="{INK}">{esc(wd.strip())}</text>')
-    s.append(f'<text x="{w-pad_r}" y="{h-6}" text-anchor="end" font-size="10.5" fill="{MUT}">Lỗ ròng · ĐVT: tỷ VNĐ</text>')
+    s.append(f'<text x="{w-pad_r}" y="{h-6}" text-anchor="end" font-size="10.5" fill="{MUT}">{esc(foot)} · ĐVT: tỷ VNĐ</text>')
     s.append('</svg>'); return "".join(s)
 
 # ---------- two side-by-side donuts + right-side legend (share of total), plan vs actual ----------
-def two_donuts(cats, totP, totA, w=900, h=344):
+def two_donuts(cats, totP, totA, w=900, h=344, titleP="Kế hoạch / Budget", titleA="Thực hiện / Actual"):
     import math
     r=90; ir=55; cy=196; cxL=150; cxR=362; lx=500
     s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
@@ -254,8 +258,8 @@ def two_donuts(cats, totP, totA, w=900, h=344):
         out.append(f'<text x="{cx}" y="{cy+24}" text-anchor="middle" font-size="11" fill="{MUT}">Nhân sự</text>')
         return "".join(out)
     ns=[c for c in cats if c[0]=="Nhân sự"][0]
-    s.append(draw(cxL,1,"Kế hoạch",vnd(totP),f"{ns[1]:.1f}%".replace('.',',')))
-    s.append(draw(cxR,2,"Thực hiện 31/08",vnd(totA),f"{ns[2]:.1f}%".replace('.',',')))
+    s.append(draw(cxL,1,titleP,vnd(totP),f"{ns[1]:.1f}%".replace('.',',')))
+    s.append(draw(cxR,2,titleA,vnd(totA),f"{ns[2]:.1f}%".replace('.',',')))
     ly=76
     for lab,pp,ap,col in cats:
         s.append(f'<rect x="{lx}" y="{ly-11}" width="13" height="13" rx="2" fill="{col}"/>')
@@ -265,7 +269,7 @@ def two_donuts(cats, totP, totA, w=900, h=344):
     return "".join(s)
 
 # ---------- single-series % bars (chart 3: % đạt) ----------
-def pctbars(rows, w=650, maxv=25):
+def pctbars(rows, w=650, maxv=25, heads=("Sản phẩm / Product","% hoàn thành · % of budget","KH DT năm · Budget")):
     # rows: (label, pct, color, khvnd_str)   bảng 4 cột: nhãn | thanh | % (căn phải) | KH DT (căn phải)
     pad_l=196; pad_t=22; rh=32
     plot_w=300                       # vùng thanh
@@ -273,9 +277,9 @@ def pctbars(rows, w=650, maxv=25):
     x_kh=w-14                        # cột KH DT căn phải, sát ngay cột %
     h=pad_t+8+rh*len(rows)
     s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
-    s.append(f'<text x="{pad_l-8}" y="14" text-anchor="end" font-size="11.5" font-weight="600" fill="{INKS}">Sản phẩm</text>')
-    s.append(f'<text x="{(pad_l+x_pct)/2:.0f}" y="14" text-anchor="middle" font-size="11.5" font-weight="600" fill="{INKS}">% thực thu / KH năm</text>')
-    s.append(f'<text x="{x_kh}" y="14" text-anchor="end" font-size="11.5" font-weight="600" fill="{INKS}">KH DT</text>')
+    s.append(f'<text x="{pad_l-8}" y="14" text-anchor="end" font-size="11.5" font-weight="600" fill="{INKS}">{esc(heads[0])}</text>')
+    s.append(f'<text x="{(pad_l+x_pct)/2:.0f}" y="14" text-anchor="middle" font-size="11.5" font-weight="600" fill="{INKS}">{esc(heads[1])}</text>')
+    s.append(f'<text x="{x_kh}" y="14" text-anchor="end" font-size="11.5" font-weight="600" fill="{INKS}">{esc(heads[2])}</text>')
     for i,(lab,v,col,kh) in enumerate(rows):
         y=pad_t+i*rh; bw=v/maxv*plot_w
         s.append(f'<text x="{pad_l-8}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12.5" fill="{INK}">{esc(lab)}</text>')
@@ -283,6 +287,32 @@ def pctbars(rows, w=650, maxv=25):
         s.append(f'<rect x="{pad_l}" y="{y+5:.1f}" width="{max(bw,0.6):.1f}" height="{rh-12}" fill="{col}"/>')
         s.append(f'<text x="{x_pct}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{v:.1f}%</text>')
         s.append(f'<text x="{x_kh}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12.5" fill="{INKS}" style="font-variant-numeric:tabular-nums">{esc(kh)}</text>')
+    s.append('</svg>'); return "".join(s)
+
+# ---------- one diverging margin panel (chart 4 is two of these side by side) ----------
+def marginbars(rows, title, LMIN, RMAX, pos=ACC, neg=CRIT, w=440):
+    # rows: (label, pct or None). None = product has no revenue yet -> "n/a".
+    # Values outside [LMIN, RMAX] are clamped to the edge and marked ★; the
+    # printed number is always the true one.
+    pad_l=132; pad_r=64; pad_t=48; rh=30
+    h=pad_t+rh*len(rows)+20
+    plot_w=w-pad_l-pad_r; span=RMAX-LMIN
+    zero=pad_l+(0-LMIN)/span*plot_w
+    s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
+    s.append(f'<text x="10" y="26" font-size="14.5" font-weight="600" fill="{INK}">{esc(title)}</text>')
+    s.append(f'<line x1="{zero:.1f}" y1="{pad_t}" x2="{zero:.1f}" y2="{h-18:.1f}" stroke="{RULE}"/>')
+    for i,(lab,v) in enumerate(rows):
+        y=pad_t+i*rh
+        s.append(f'<text x="{pad_l-8}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="11.5" fill="{INK}">{esc(lab)}</text>')
+        if v is None:
+            s.append(f'<text x="{w-6}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="10.5" fill="{MUT}">n/a</text>')
+            continue
+        vc=max(LMIN,min(RMAX,v)); x=pad_l+(vc-LMIN)/span*plot_w; col=pos if v>=0 else neg
+        bx,bw=(zero,x-zero) if vc>=0 else (x,zero-x)
+        s.append(f'<rect x="{bx:.1f}" y="{y+6:.1f}" width="{bw:.1f}" height="16" fill="{col}"/>')
+        clamp="" if LMIN<=v<=RMAX else "★"
+        s.append(f'<text x="{w-6}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="10.5" font-weight="600" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{v:+.1f}%{clamp}</text>')
+    s.append(f'<text x="{zero:.1f}" y="{h-4:.1f}" text-anchor="middle" font-size="10" fill="{MUT}">0%</text>')
     s.append('</svg>'); return "".join(s)
 
 # ---------- single-series diverging margin (chart 4: biên gộp kế hoạch) ----------

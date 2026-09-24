@@ -106,7 +106,45 @@ into `fill`/`stroke`; `page_style()` emits `svg [fill="#…"]{fill:var(--…)}`
 rules so every chart colour maps to a named token. **Add any new chart colour to
 `SVG_TOKENS` (or `CAT`)** so it stays on the palette.
 
-Caveat: the committed `index.html` (hand upload of 09-20) is bilingual and has
-a 5-questions card that `build_auto.py` does not produce. The next generator
-run will replace it with the generator's (Vietnamese-only) layout — the styling
-will carry over, the extra copy will not.
+## The judgment layer: `judgment/judgment.html`
+
+The page has two layers, and they live in two places.
+
+- **Computed** — charts #1–#7, the KPI row, the P&L table and every chart
+  title, subtitle and note (bilingual VN / EN). All in `build_auto.py`; the
+  numbers come from the workbook and follow it with no human step.
+- **Judgment** — the verdict, the "Đề xuất phê duyệt HÔM NAY / Decision
+  requested today" block, the #8 full-year scenarios and their caption, the
+  Stage-Gate table and the 5 hard questions. All in `judgment/judgment.html`,
+  edited by hand. `build_auto.py` only reads it and never writes it.
+
+`build_auto.py` reproduces the committed `index.html` byte-for-byte: checked
+2026-09-24 against a fixture rebuilt from the page's own figures for 08.2026
+(`GDSH_EXTRACT_JSON` + `GDSH_OUT_DIR` + `GDSH_TODAY=20/09/2026`). So turning
+the workflow on changes the numbers and nothing else.
+
+Judgment prose quotes live numbers through `{placeholders}` (`{dt_pct}`,
+`{surge_x}`, `{cf_lk}` …, listed at the top of the file and in `PLACEHOLDERS`
+in `build_auto.py`), so a figure in the verdict can never disagree with the
+chart beside it. An unknown placeholder or a missing block stops the build.
+
+### What the reviewer does each month
+
+After a new period is published (the 17th run, or by hand):
+
+1. Open `judgment/judgment.html` and read each block against the new page.
+   The numbers inside the prose have already moved; the *argument* has not.
+2. Rewrite what the new numbers no longer support. The literal figures that
+   are not placeholders are the ones to check by hand: the scenario losses in
+   `scenarios` (and "−8,4 tỷ" in question 5), "8.800 lượt trải nghiệm 60k",
+   "vốn điều lệ 10 tỷ", and the Stage-Gate thresholds.
+3. If the #8 scenarios were re-run, replace their values (full-year net loss
+   in đồng; `plan` means the plan's own loss, computed).
+4. Set `review_asof` to today. The page prints it in the masthead, under #8
+   and under the Stage-Gate, so a stale judgment is visible to the board.
+5. Commit. The next build (or `python3 build_auto.py` with the workbook)
+   picks it up.
+
+Nothing in the workflow edits the judgment file, so if nobody reviews it the
+page keeps last month's argument with this month's numbers — and says so via
+the `review_asof` date.
