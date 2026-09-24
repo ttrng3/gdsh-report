@@ -49,13 +49,11 @@ thead th{background:var(--surface);color:var(--ink-soft);font-weight:600}
 /* ============================================================
    APPLE LAYER — apple-design skill, 2026-09-24 (modelled on Omni-TMDV).
    Additive: sits after the base sheet and only overrides.
-   Dark mode is SCREEN-only — print always gets the light sheet.
+   LIGHT ONLY (Ty, 2026-09-24): no dark theme — do not add one.
    ============================================================ */
-:root{color-scheme:light dark;
+:root{color-scheme:light;
   --shadow-card:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
   --shadow-float:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06)}
-@media screen and (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000000;--paper:#1C1C1E;--surface:#2C2C2E;--sunk:#2C2C2E;--rule:#38383A;--ink:#FFFFFF;--ink-soft:#D1D1D6;--muted:#98989F;--accent:#0A84FF;--accent-ink:#64B5FF;--accent-bg:rgba(10,132,255,.16);--critical-fill:#FF453A;--critical:#FF6961;--warning-fill:#FF9F0A;--warning:#FFB340;--c1:#5E5CE6;--c2:#BF5AF2;--c3:#40C8E0;--c4:#AC8E68;--c5:#98989D;--c6:#7C7C80;--c7:#636366;--c8:#545458;--c9:#48484A;--shadow-card:none;--shadow-float:0 8px 24px rgba(0,0,0,.5)}}
-@media screen{:root[data-theme="dark"]{--bg:#000000;--paper:#1C1C1E;--surface:#2C2C2E;--sunk:#2C2C2E;--rule:#38383A;--ink:#FFFFFF;--ink-soft:#D1D1D6;--muted:#98989F;--accent:#0A84FF;--accent-ink:#64B5FF;--accent-bg:rgba(10,132,255,.16);--critical-fill:#FF453A;--critical:#FF6961;--warning-fill:#FF9F0A;--warning:#FFB340;--c1:#5E5CE6;--c2:#BF5AF2;--c3:#40C8E0;--c4:#AC8E68;--c5:#98989D;--c6:#7C7C80;--c7:#636366;--c8:#545458;--c9:#48484A;--shadow-card:none;--shadow-float:0 8px 24px rgba(0,0,0,.5)}}
 
 /* Charts — every SVG fill/stroke the builders write is repainted from its token */
 svg [fill="#F2F2F7"]{fill:var(--sunk)} svg [stroke="#F2F2F7"]{stroke:var(--sunk)}
@@ -89,7 +87,6 @@ body{font-optical-sizing:auto;text-rendering:optimizeLegibility}
 
 /* Accessibility — increased contrast strengthens hairlines and captions */
 @media (prefers-contrast:more){:root{--rule:#8E8E93;--muted:#3C3C43}}
-@media (prefers-contrast:more) and (prefers-color-scheme:dark){:root:not([data-theme="light"]){--rule:#8E8E93;--muted:#D1D1D6}}
 
 @media print{.card,.kpi,.legend-note,.verdict{box-shadow:none!important}}
 </style></head>

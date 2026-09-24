@@ -362,13 +362,11 @@ _APPLE_CSS = """
 /* ============================================================
    APPLE LAYER — apple-design skill, 2026-09-24 (modelled on Omni-TMDV).
    Additive: sits after the base sheet and only overrides.
-   Dark mode is SCREEN-only — print always gets the light sheet.
+   LIGHT ONLY (Ty, 2026-09-24): no dark theme — do not add one.
    ============================================================ */
-:root{color-scheme:light dark;
+:root{color-scheme:light;
   --shadow-card:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
   --shadow-float:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06)}
-@media screen and (prefers-color-scheme:dark){:root:not([data-theme="light"]){@DARK@}}
-@media screen{:root[data-theme="dark"]{@DARK@}}
 
 /* Charts — every SVG fill/stroke the builders write is repainted from its token */
 @SVGMAP@
@@ -383,7 +381,6 @@ body{font-optical-sizing:auto;text-rendering:optimizeLegibility}
 
 /* Accessibility — increased contrast strengthens hairlines and captions */
 @media (prefers-contrast:more){:root{--rule:#8E8E93;--muted:#3C3C43}}
-@media (prefers-contrast:more) and (prefers-color-scheme:dark){:root:not([data-theme="light"]){--rule:#8E8E93;--muted:#D1D1D6}}
 
 @media print{.card,.kpi,.legend-note,.verdict{box-shadow:none!important}}
 """
