@@ -91,3 +91,23 @@ A mirror artifact existed for a few hours that day and was deleted. Do not
 recreate one, and do not add an artifact URL to this repo. `tools/build-fragment.py`
 is kept only because it is the one thing that can derive a standalone fragment
 of this page if it is ever needed; nothing in the refresh calls it.
+
+## Look: Apple layer, light + dark (2026-09-24)
+
+The page follows the `apple-design` skill (it replaced `ty-artifact-standard`,
+retired 2026-09-24): Apple HIG light tokens, system font stack (no Playfair / no
+webfont), and a `<style id="apple-layer">` with **dark mode on screen only**.
+Print always gets the light sheet. The page is not "light only" any more.
+
+All of it lives in `gdsh_render.py` — the palette constants, `ink()` (text on
+a tint never uses the raw fill), `SVG_TOKENS`, and `page_style()`, which
+`build_auto.py` drops into `<head>`. The SVG builders still write light hex
+into `fill`/`stroke`; `page_style()` emits `svg [fill="#…"]{fill:var(--…)}`
+rules so every chart colour follows the theme. **Any new chart colour must be
+added to `SVG_TOKENS` (or `CAT`) with a dark value**, or it stays light-mode
+in dark.
+
+Caveat: the committed `index.html` (hand upload of 09-20) is bilingual and has
+a 5-questions card that `build_auto.py` does not produce. The next generator
+run will replace it with the generator's (Vietnamese-only) layout — the styling
+will carry over, the extra copy will not.

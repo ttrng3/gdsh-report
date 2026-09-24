@@ -2,10 +2,28 @@
 # GDSH shared render module (chart SVG builders + palette). Auto-extracted from verified generator.
 import html
 
-PAPER="#FFFFFF"; SURF="#FAFAF8"; SUNK="#F3F3EF"; INK="#1C1C1A"; INKS="#44443F"
-MUT="#6B6B64"; RULE="#E4E4DF"; ACC="#0F6E52"; ACCBG="#EAF3EF"; CRIT="#B02418"; WARN="#9A6B00"
-PLAN=ACC   # Kế hoạch = xanh
+# Apple HIG light palette (2026-09-24) — replaced the warm Playfair palette.
+# Names kept; values migrated. ACC/CRIT/WARN are FILLS (bars, dots, lines);
+# text never sits in a raw fill — ink() returns the darker *_INK variant that
+# clears 4.5:1 on white. MUT is #6C6C70 (not HIG #8E8E93) to keep AA on 12px.
+BG="#F2F2F7"; PAPER="#FFFFFF"; SURF="#F2F2F7"; SUNK="#F2F2F7"; INK="#1C1C1E"; INKS="#3C3C43"
+MUT="#6C6C70"; RULE="#E5E5EA"; ACC="#007AFF"; ACCBG="#E8F1FE"; CRIT="#FF3B30"; WARN="#FF9500"
+ACC_INK="#0060DF"; CRIT_INK="#C4271D"; WARN_INK="#8A5200"
+PLAN=ACC   # Kế hoạch = xanh (blue)
 ACT=CRIT   # Thực hiện = đỏ
+# Categorical fills for the OPEX donut (#2) — not the semantic four, so a slice
+# never reads as "plan" or "critical". Light hex, CSS token.
+CAT=[("#5856D6","--c1"),("#AF52DE","--c2"),("#30B0C7","--c3"),("#A2845E","--c4"),
+     ("#8E8E93","--c5"),("#AEAEB2","--c6"),("#C7C7CC","--c7"),("#D1D1D6","--c8"),("#DCDCE0","--c9")]
+def ink(c): return {ACC:ACC_INK, CRIT:CRIT_INK, WARN:WARN_INK}.get(c, c)
+
+# Every colour the SVG builders write as a fill/stroke attribute, and the CSS
+# token that repaints it. page_style() turns this into `svg [fill="#…"]` rules,
+# so the charts follow dark mode without the builders emitting var() into
+# presentation attributes (which WebKit does not resolve).
+SVG_TOKENS=[(SUNK,"--sunk"),(INK,"--ink"),(INKS,"--ink-soft"),(MUT,"--muted"),(RULE,"--rule"),
+            (ACC,"--accent"),(CRIT,"--critical-fill"),(WARN,"--warning-fill"),
+            (ACC_INK,"--accent-ink"),(CRIT_INK,"--critical"),(WARN_INK,"--warning")]+CAT
 
 def esc(s): return html.escape(str(s))
 def tr(x): return f"{x/1e6:,.0f}"      # triệu
@@ -54,7 +72,7 @@ def ghbars(rows, w=820, unit="triệu", show_pct=True):
     s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
     # legend
     s.append(f'<rect x="{pad_l}" y="10" width="12" height="12" fill="{PLAN}"/><text x="{pad_l+16}" y="20" font-size="12" fill="{INKS}">Kế hoạch</text>')
-    s.append(f'<rect x="{pad_l+110}" y="10" width="12" height="12" fill="{ACT}"/><text x="{pad_l+126}" y="20" font-size="12" fill="{INKS}">Thực hiện 31/08</text>')
+    s.append(f'<rect x="{pad_l+110}" y="10" width="12" height="12" fill="{ink(ACT)}"/><text x="{pad_l+126}" y="20" font-size="12" fill="{INKS}">Thực hiện 31/08</text>')
     for i,(lab,p,a) in enumerate(rows):
         y=pad_t+i*rh
         pbw=p/mx*plot_w; abw=a/mx*plot_w
@@ -64,10 +82,10 @@ def ghbars(rows, w=820, unit="triệu", show_pct=True):
         s.append(f'<text x="{pad_l+pbw+5:.1f}" y="{y+18:.1f}" font-size="10.5" fill="{INKS}" style="font-variant-numeric:tabular-nums">{tr(p)}</text>')
         # actual bar (bottom)
         s.append(f'<rect x="{pad_l}" y="{y+26:.1f}" width="{max(abw,0.6):.1f}" height="15" fill="{ACT}"/>')
-        s.append(f'<text x="{pad_l+max(abw,0.6)+5:.1f}" y="{y+38:.1f}" font-size="10.5" fill="{ACT}" style="font-variant-numeric:tabular-nums">{tr(a)}</text>')
+        s.append(f'<text x="{pad_l+max(abw,0.6)+5:.1f}" y="{y+38:.1f}" font-size="10.5" fill="{ink(ACT)}" style="font-variant-numeric:tabular-nums">{tr(a)}</text>')
         if show_pct:
             r=(a/p*100) if p else 0
-            s.append(f'<text x="{w-pad_r+92:.1f}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12.5" font-weight="600" fill="{ACT if r<50 else INKS}" style="font-variant-numeric:tabular-nums">{r:.1f}%</text>')
+            s.append(f'<text x="{w-pad_r+92:.1f}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12.5" font-weight="600" fill="{ink(ACT) if r<50 else INKS}" style="font-variant-numeric:tabular-nums">{r:.1f}%</text>')
     s.append(f'<text x="{w-4}" y="{pad_t-16:.1f}" text-anchor="end" font-size="10.5" fill="{MUT}">% đạt</text>')
     s.append(f'<text x="{w-4}" y="{h-4}" text-anchor="end" font-size="10.5" fill="{MUT}">ĐVT: {unit} VNĐ</text>')
     s.append('</svg>'); return "".join(s)
@@ -81,7 +99,7 @@ def mixbars(rows, w=820, cat="chi phí vận hành"):
     mx=max(max(r[1],r[2]) for r in rows)*1.06
     s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
     s.append(f'<rect x="{pad_l}" y="10" width="12" height="12" fill="{PLAN}"/><text x="{pad_l+16}" y="20" font-size="12" fill="{INKS}">Cơ cấu Kế hoạch</text>')
-    s.append(f'<rect x="{pad_l+140}" y="10" width="12" height="12" fill="{ACT}"/><text x="{pad_l+156}" y="20" font-size="12" fill="{INKS}">Cơ cấu Thực hiện 31/08</text>')
+    s.append(f'<rect x="{pad_l+140}" y="10" width="12" height="12" fill="{ink(ACT)}"/><text x="{pad_l+156}" y="20" font-size="12" fill="{INKS}">Cơ cấu Thực hiện 31/08</text>')
     s.append(f'<text x="{w-4}" y="20" text-anchor="end" font-size="10.5" fill="{MUT}">Δ điểm %</text>')
     for i,row in enumerate(rows):
         lab,p,a = row[0],row[1],row[2]; flag = row[3] if len(row)>3 else False
@@ -91,8 +109,8 @@ def mixbars(rows, w=820, cat="chi phí vận hành"):
         s.append(f'<rect x="{pad_l}" y="{y+6:.1f}" width="{pbw:.1f}" height="15" fill="{PLAN}"/>')
         s.append(f'<text x="{pad_l+pbw+5:.1f}" y="{y+18:.1f}" font-size="10.5" fill="{INKS}" style="font-variant-numeric:tabular-nums">{p:.1f}%</text>')
         s.append(f'<rect x="{pad_l}" y="{y+26:.1f}" width="{max(abw,0.6):.1f}" height="15" fill="{ACT}"/>')
-        s.append(f'<text x="{pad_l+max(abw,0.6)+5:.1f}" y="{y+38:.1f}" font-size="10.5" fill="{ACT}" style="font-variant-numeric:tabular-nums">{a:.1f}%</text>')
-        dcol=CRIT if flag else INKS
+        s.append(f'<text x="{pad_l+max(abw,0.6)+5:.1f}" y="{y+38:.1f}" font-size="10.5" fill="{ink(ACT)}" style="font-variant-numeric:tabular-nums">{a:.1f}%</text>')
+        dcol=ink(CRIT) if flag else INKS
         s.append(f'<text x="{w-6:.1f}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12.5" font-weight="600" fill="{dcol}" style="font-variant-numeric:tabular-nums">{d:+.1f}</text>')
     s.append(f'<text x="{w-6}" y="{h-4}" text-anchor="end" font-size="10.5" fill="{MUT}">% trong TỔNG {cat}</text>')
     s.append('</svg>'); return "".join(s)
@@ -106,7 +124,7 @@ def gpbars(rows, w=820, LMIN=-0.8, RMAX=2.5):
     zero=pad_l+(0-LMIN)/span*plot_w
     s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
     s.append(f'<rect x="{pad_l}" y="10" width="12" height="12" fill="{PLAN}"/><text x="{pad_l+16}" y="20" font-size="12" fill="{INKS}">Kế hoạch (cả năm)</text>')
-    s.append(f'<rect x="{pad_l+150}" y="10" width="12" height="12" fill="{ACT}"/><text x="{pad_l+166}" y="20" font-size="12" fill="{INKS}">Thực hiện (6 tháng)</text>')
+    s.append(f'<rect x="{pad_l+150}" y="10" width="12" height="12" fill="{ink(ACT)}"/><text x="{pad_l+166}" y="20" font-size="12" fill="{INKS}">Thực hiện (6 tháng)</text>')
     s.append(f'<line x1="{zero:.1f}" y1="{pad_t}" x2="{zero:.1f}" y2="{h-16}" stroke="{RULE}"/>')
     for i,(lab,pl,ac) in enumerate(rows):
         y=pad_t+i*rh
@@ -119,7 +137,7 @@ def gpbars(rows, w=820, LMIN=-0.8, RMAX=2.5):
             else:
                 s.append(f'<rect x="{x:.1f}" y="{y+off:.1f}" width="{max(zero-x,0.6):.1f}" height="14" fill="{col}"/>')
                 tx=x-5; anc="end"
-            s.append(f'<text x="{tx:.1f}" y="{y+off+11:.1f}" text-anchor="{anc}" font-size="10" fill="{col}" style="font-variant-numeric:tabular-nums">{v:+.2f}</text>')
+            s.append(f'<text x="{tx:.1f}" y="{y+off+11:.1f}" text-anchor="{anc}" font-size="10" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{v:+.2f}</text>')
     s.append(f'<text x="{zero:.1f}" y="{h-2}" text-anchor="middle" font-size="10" fill="{MUT}">0</text>')
     s.append(f'<text x="{w-6}" y="{h-2}" text-anchor="end" font-size="10.5" fill="{MUT}">Đóng góp LN gộp · ĐVT: tỷ VNĐ</text>')
     s.append('</svg>'); return "".join(s)
@@ -133,7 +151,7 @@ def gmargin(rows, w=820, LMIN=-160, RMAX=80):
     zero=pad_l+(0-LMIN)/span*plot_w
     s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
     s.append(f'<rect x="{pad_l}" y="10" width="12" height="12" fill="{PLAN}"/><text x="{pad_l+16}" y="20" font-size="12" fill="{INKS}">Biên KH</text>')
-    s.append(f'<rect x="{pad_l+90}" y="10" width="12" height="12" fill="{ACT}"/><text x="{pad_l+106}" y="20" font-size="12" fill="{INKS}">Biên TH 31/08 (kẹp trần −160%)</text>')
+    s.append(f'<rect x="{pad_l+90}" y="10" width="12" height="12" fill="{ink(ACT)}"/><text x="{pad_l+106}" y="20" font-size="12" fill="{INKS}">Biên TH 31/08 (kẹp trần −160%)</text>')
     s.append(f'<line x1="{zero:.1f}" y1="{pad_t}" x2="{zero:.1f}" y2="{h-16}" stroke="{RULE}"/>')
     def barx(v):
         vc=max(LMIN,min(RMAX,v))
@@ -151,7 +169,7 @@ def gmargin(rows, w=820, LMIN=-160, RMAX=80):
                 s.append(f'<rect x="{x:.1f}" y="{y+off:.1f}" width="{zero-x:.1f}" height="14" fill="{col}"/>')
                 tx=x-5; anc="end"
             clamp="" if LMIN<v<RMAX else "★"
-            s.append(f'<text x="{tx:.1f}" y="{y+off+11:.1f}" text-anchor="{anc}" font-size="10" fill="{col}" style="font-variant-numeric:tabular-nums">{v:+.0f}%{clamp}</text>')
+            s.append(f'<text x="{tx:.1f}" y="{y+off+11:.1f}" text-anchor="{anc}" font-size="10" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{v:+.0f}%{clamp}</text>')
     s.append(f'<text x="{zero:.1f}" y="{h-2}" text-anchor="middle" font-size="10" fill="{MUT}">0%   (★ = kẹp trần, giá trị thật ghi cạnh)</text>')
     s.append('</svg>'); return "".join(s)
 
@@ -176,10 +194,10 @@ def line2(actual, plan, w=980, h=420, unit="tỷ"):
         s.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.4" fill="{PLAN}"/>')
     for (x,y),(lab,v) in zip(pa,actual):
         s.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="{ACT}"/>')
-        s.append(f'<text x="{x:.1f}" y="{y+21:.1f}" text-anchor="middle" font-size="14" font-weight="600" fill="{ACT}" style="font-variant-numeric:tabular-nums">{v/1e9:.2f}</text>')
+        s.append(f'<text x="{x:.1f}" y="{y+21:.1f}" text-anchor="middle" font-size="14" font-weight="600" fill="{ink(ACT)}" style="font-variant-numeric:tabular-nums">{v/1e9:.2f}</text>')
         s.append(f'<text x="{x:.1f}" y="{h-26:.1f}" text-anchor="middle" font-size="15" fill="{INK}">{esc(lab)}</text>')
     s.append(f'<rect x="{pad_l}" y="12" width="20" height="5" fill="{PLAN}"/><text x="{pad_l+28}" y="21" font-size="14" fill="{INKS}">Kế hoạch (mốc T3–T8, phân bổ đều)</text>')
-    s.append(f'<rect x="{pad_l+360}" y="12" width="20" height="5" fill="{ACT}"/><text x="{pad_l+388}" y="21" font-size="14" fill="{INKS}">Thực hiện</text>')
+    s.append(f'<rect x="{pad_l+360}" y="12" width="20" height="5" fill="{ink(ACT)}"/><text x="{pad_l+388}" y="21" font-size="14" fill="{INKS}">Thực hiện</text>')
     s.append(f'<text x="{w-pad_r}" y="{h-6}" text-anchor="end" font-size="12.5" fill="{MUT}">Lỗ P&L lũy kế · ĐVT: {unit} VNĐ</text>')
     s.append('</svg>'); return "".join(s)
 
@@ -194,7 +212,7 @@ def vbars(rows, w=760, h=300, unit="", note=""):
         bh=v/mx*plot_h; x=gw*i+(gw-bw)/2; y=pad_t+plot_h-bh
         disp=(f"{v:,.0f}".replace(",",".") if abs(v-round(v))<1e-9 else f"{v:.2f}".replace(".",","))
         s.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{bh:.1f}" fill="{col}"/>')
-        s.append(f'<text x="{x+bw/2:.1f}" y="{y-8:.1f}" text-anchor="middle" font-size="16" font-weight="600" fill="{col}" style="font-variant-numeric:tabular-nums">{disp}</text>')
+        s.append(f'<text x="{x+bw/2:.1f}" y="{y-8:.1f}" text-anchor="middle" font-size="16" font-weight="600" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{disp}</text>')
         for k,wd in enumerate(lab.split("|")):
             s.append(f'<text x="{x+bw/2:.1f}" y="{h-pad_b+18+k*15:.1f}" text-anchor="middle" font-size="11.5" fill="{INK}">{esc(wd.strip())}</text>')
     if note: s.append(f'<text x="{w-6}" y="{h-6}" text-anchor="end" font-size="10.5" fill="{MUT}">{esc(note)}</text>')
@@ -208,7 +226,7 @@ def loss_bars(rows, w=820, h=340):
     for i,(lab,v,col) in enumerate(rows):
         bh=abs(v)/mx*plot_h; x=pad_l+i*gw+gw*0.25; y=pad_t
         s.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{bh:.1f}" fill="{col}"/>')
-        s.append(f'<text x="{x+bw/2:.1f}" y="{y-8:.1f}" text-anchor="middle" font-size="14" font-weight="600" fill="{col}" style="font-variant-numeric:tabular-nums">{v/1e9:.2f}</text>')
+        s.append(f'<text x="{x+bw/2:.1f}" y="{y-8:.1f}" text-anchor="middle" font-size="14" font-weight="600" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{v/1e9:.2f}</text>')
         for k,wd in enumerate(lab.split("|")):
             s.append(f'<text x="{x+bw/2:.1f}" y="{h-pad_b+16+k*14:.1f}" text-anchor="middle" font-size="11" fill="{INK}">{esc(wd.strip())}</text>')
     s.append(f'<text x="{w-pad_r}" y="{h-6}" text-anchor="end" font-size="10.5" fill="{MUT}">Lỗ ròng · ĐVT: tỷ VNĐ</text>')
@@ -263,7 +281,7 @@ def pctbars(rows, w=650, maxv=25):
         s.append(f'<text x="{pad_l-8}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12.5" fill="{INK}">{esc(lab)}</text>')
         s.append(f'<rect x="{pad_l}" y="{y+5:.1f}" width="{plot_w}" height="{rh-12}" fill="{SUNK}"/>')
         s.append(f'<rect x="{pad_l}" y="{y+5:.1f}" width="{max(bw,0.6):.1f}" height="{rh-12}" fill="{col}"/>')
-        s.append(f'<text x="{x_pct}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12" fill="{col}" style="font-variant-numeric:tabular-nums">{v:.1f}%</text>')
+        s.append(f'<text x="{x_pct}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{v:.1f}%</text>')
         s.append(f'<text x="{x_kh}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12.5" fill="{INKS}" style="font-variant-numeric:tabular-nums">{esc(kh)}</text>')
     s.append('</svg>'); return "".join(s)
 
@@ -280,6 +298,103 @@ def divbars(rows, w=820, maxv=80):
         s.append(f'<text x="{pad_l-8}" y="{y+rh/2+4:.1f}" text-anchor="end" font-size="12.5" fill="{INK}">{esc(lab)}</text>')
         s.append(f'<rect x="{x:.1f}" y="{y+6:.1f}" width="{bw:.1f}" height="{rh-14}" fill="{col}"/>')
         tx=zero+bw+6 if v>=0 else zero-bw-6; anc="start" if v>=0 else "end"
-        s.append(f'<text x="{tx:.1f}" y="{y+rh/2+4:.1f}" text-anchor="{anc}" font-size="12" fill="{col}" style="font-variant-numeric:tabular-nums">{v:+.1f}%</text>')
+        s.append(f'<text x="{tx:.1f}" y="{y+rh/2+4:.1f}" text-anchor="{anc}" font-size="12" fill="{ink(col)}" style="font-variant-numeric:tabular-nums">{v:+.1f}%</text>')
     s.append(f'<text x="{zero:.1f}" y="{h-2:.1f}" text-anchor="middle" font-size="10.5" fill="{MUT}">Biên gộp kế hoạch 0%</text>')
     s.append('</svg>'); return "".join(s)
+
+# ---------- page stylesheet: base sheet + Apple layer (shared by build_auto.py) ----------
+# Lives here, not in build_auto.py, so the <head> can be rebuilt without an Excel
+# input. System font stack only — the Playfair/Be Vietnam webfonts were dropped.
+_BASE_CSS = """
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);margin:0;line-height:1.55;font-size:15px}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 20px 64px}
+h1{font-weight:600;font-size:30px;line-height:1.2;letter-spacing:-.021em;margin:0 0 6px}
+h2{font-weight:600;font-size:19px;letter-spacing:-.012em;margin:0}
+.masthead{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:8px}
+.meta{color:var(--muted);font-size:13px;margin-top:8px}
+.verdict{background:var(--accent-bg);border:1px solid var(--accent);border-radius:12px;padding:18px 20px;margin:22px 0}
+.verdict .lead{font-size:20px;color:var(--accent-ink);font-weight:600;letter-spacing:-.012em;margin:0 0 6px}
+.verdict p{margin:6px 0 0}
+.legend-note{font-size:12.5px;color:var(--ink-soft);margin:14px 0 0;padding:9px 13px;background:var(--paper);border:1px solid var(--rule);border-radius:8px}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:baseline;margin:0 3px 0 8px}
+.kpirow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.kpi{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+.kpi.crit{border-left:3px solid var(--critical-fill)} .kpi.warn{border-left:3px solid var(--warning-fill)}
+.kv{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi.crit .kv{color:var(--critical)} .kpi.warn .kv{color:var(--warning)}
+.kl{color:var(--muted);font-size:12.5px;margin-top:4px}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:20px 22px;margin:16px 0}
+.chd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}
+.tag{font-size:11px;color:var(--accent-ink);border:1px solid var(--accent);border-radius:20px;padding:2px 10px;white-space:nowrap}
+.sub{color:var(--ink-soft);font-size:13.5px;margin:4px 0 14px}
+.note{background:var(--surface);border-left:3px solid var(--warning-fill);padding:10px 14px;border-radius:0 8px 8px 0;font-size:13.5px;color:var(--ink-soft);margin-top:14px}
+.note.crit{border-left-color:var(--critical-fill)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+thead th{background:var(--surface);color:var(--ink-soft);font-weight:600}
+.neg{color:var(--critical)}
+.q{border:1px solid var(--rule);border-radius:8px;padding:14px 16px 14px 46px;margin:10px 0;position:relative;background:var(--surface);counter-increment:q}
+.qbox{counter-reset:q}
+.q:before{content:counter(q);position:absolute;left:14px;top:14px;width:22px;height:22px;background:var(--accent);color:#fff;border-radius:50%;text-align:center;line-height:22px;font-size:13px;font-weight:600}
+.q .qh{font-weight:600}
+.qm{color:var(--muted);font-size:12.5px;display:block;margin-top:4px}
+.qm b{color:var(--ink-soft);font-weight:600}
+.gate td:first-child{font-weight:600;white-space:nowrap;color:var(--accent-ink)}
+.gate td{vertical-align:top}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.foot{color:var(--muted);font-size:12px;margin-top:28px;border-top:1px solid var(--rule);padding-top:14px}
+@media (max-width:720px){.kpirow{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}h1{font-size:24px}}
+@media print{body{font-size:12px;background:#fff}.wrap{max-width:none;padding:0}.card,.kpi,.verdict,.note,.q,.legend-note{background:#fff!important;break-inside:avoid}.kv{color:var(--ink)!important}:root{--muted:#222;--ink-soft:#222}.tag{color:#222;border-color:#222}svg{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+"""
+
+# Dark values — SCREEN only; print always gets the light sheet.
+_DARK = ("--bg:#000000;--paper:#1C1C1E;--surface:#2C2C2E;--sunk:#2C2C2E;--rule:#38383A;"
+         "--ink:#FFFFFF;--ink-soft:#D1D1D6;--muted:#98989F;"
+         "--accent:#0A84FF;--accent-ink:#64B5FF;--accent-bg:rgba(10,132,255,.16);"
+         "--critical-fill:#FF453A;--critical:#FF6961;--warning-fill:#FF9F0A;--warning:#FFB340;"
+         "--c1:#5E5CE6;--c2:#BF5AF2;--c3:#40C8E0;--c4:#AC8E68;--c5:#98989D;--c6:#7C7C80;"
+         "--c7:#636366;--c8:#545458;--c9:#48484A;"
+         "--shadow-card:none;--shadow-float:0 8px 24px rgba(0,0,0,.5)")
+
+_APPLE_CSS = """
+/* ============================================================
+   APPLE LAYER — apple-design skill, 2026-09-24 (modelled on Omni-TMDV).
+   Additive: sits after the base sheet and only overrides.
+   Dark mode is SCREEN-only — print always gets the light sheet.
+   ============================================================ */
+:root{color-scheme:light dark;
+  --shadow-card:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
+  --shadow-float:0 1px 3px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06)}
+@media screen and (prefers-color-scheme:dark){:root:not([data-theme="light"]){@DARK@}}
+@media screen{:root[data-theme="dark"]{@DARK@}}
+
+/* Charts — every SVG fill/stroke the builders write is repainted from its token */
+@SVGMAP@
+
+/* Typography — optical sizing; small text gets a hair of positive tracking */
+body{font-optical-sizing:auto;text-rendering:optimizeLegibility}
+.meta,.kl,.tag,.qm,.foot,.legend-note{letter-spacing:.01em}
+
+/* Materials — cards float; the verdict floats highest */
+.card,.kpi,.legend-note{box-shadow:var(--shadow-card)}
+.verdict{box-shadow:var(--shadow-float)}
+
+/* Accessibility — increased contrast strengthens hairlines and captions */
+@media (prefers-contrast:more){:root{--rule:#8E8E93;--muted:#3C3C43}}
+@media (prefers-contrast:more) and (prefers-color-scheme:dark){:root:not([data-theme="light"]){--rule:#8E8E93;--muted:#D1D1D6}}
+
+@media print{.card,.kpi,.legend-note,.verdict{box-shadow:none!important}}
+"""
+
+def page_style():
+    toks = [("--bg",BG),("--paper",PAPER),("--surface",SURF),("--sunk",SUNK),("--ink",INK),
+            ("--ink-soft",INKS),("--muted",MUT),("--rule",RULE),("--accent",ACC),("--accent-ink",ACC_INK),
+            ("--accent-bg",ACCBG),("--critical",CRIT_INK),("--critical-fill",CRIT),
+            ("--warning",WARN_INK),("--warning-fill",WARN)] + [(t,h) for h,t in CAT]
+    root = ":root{" + ";".join(f"{t}:{h}" for t,h in toks) + \
+        ';--sans:-apple-system,BlinkMacSystemFont,"San Francisco","Helvetica Neue",Helvetica,Ubuntu,Roboto,"Segoe UI",sans-serif}'
+    svgmap = "\n".join(f'svg [fill="{h}"]{{fill:var({t})}} svg [stroke="{h}"]{{stroke:var({t})}}' for h,t in SVG_TOKENS)
+    apple = _APPLE_CSS.replace("@DARK@", _DARK).replace("@SVGMAP@", svgmap)
+    return f"<style>\n{root}{_BASE_CSS}</style>\n<style id=\"apple-layer\">{apple}</style>"

@@ -9,7 +9,7 @@
 # Chạy:  GDSH_XLSX=<file.xlsx> GDSH_PERIOD=08/2026 python3 build_auto.py
 # ============================================================================
 import io, os, re, json, glob, datetime
-from gdsh_render import *          # palette, esc, vnd, tr, bn, grouped_bars, two_donuts, pctbars, gmargin, line2, vbars, loss_bars
+from gdsh_render import *          # palette, page_style, esc, vnd, tr, bn, grouped_bars, two_donuts, pctbars, gmargin, line2, vbars, loss_bars
 from gdsh_extract import extract
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -62,10 +62,12 @@ c1 = grouped_bars(
     ["Doanh thu","Giá vốn","Chi phí VH","CAPEX"], [PLAN,ACT])
 
 # ---------- #2 cơ cấu OPEX ----------
-_COL2={"Nhân sự":"#0F6E52","Marketing":"#9A6B00","KH & PB CCDC":"#7BA895",
-       "Khai trương":"#C6864F","Nhà công vụ":"#8F9B8A","Phí dịch vụ mặt bằng":"#B5876A",
-       "Điện nước":"#9AA0A6","Giao tế tiếp khách":"#C9C7BE","Khác":"#D8D5CB"}
-_cats2=sorted([(x["label"], x["kh"]/opex_kh*100, x["lk"]/opex_lk*100, _COL2.get(x["label"],"#D8D5CB")) for x in OPEX], key=lambda c:-c[1])
+# Categorical fills from gdsh_render.CAT (each has a dark-mode token) — never the semantic four.
+_C=[h for h,_ in CAT]
+_COL2={"Nhân sự":_C[0],"Marketing":_C[1],"KH & PB CCDC":_C[2],
+       "Khai trương":_C[3],"Nhà công vụ":_C[4],"Phí dịch vụ mặt bằng":_C[5],
+       "Điện nước":_C[6],"Giao tế tiếp khách":_C[7],"Khác":_C[8]}
+_cats2=sorted([(x["label"], x["kh"]/opex_kh*100, x["lk"]/opex_lk*100, _COL2.get(x["label"],_C[8])) for x in OPEX], key=lambda c:-c[1])
 c2=two_donuts(_cats2, opex_kh, opex_lk)
 def _op(lbl):  return next(x for x in OPEX if x["label"]==lbl)
 _ns,_mkt,_khpb,_ktr,_mb = _op("Nhân sự"),_op("Marketing"),_op("KH & PB CCDC"),_op("Khai trương"),_op("Phí dịch vụ mặt bằng")
@@ -139,52 +141,7 @@ PER = PERIOD.replace("/", ".")     # "08.2026" cho tiêu đề
 HTML=f"""<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Thẩm định Giáo dục Sông Hồng</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{{--paper:{PAPER};--surface:{SURF};--sunk:{SUNK};--ink:{INK};--ink-soft:{INKS};--muted:{MUT};--rule:{RULE};--accent:{ACC};--accent-bg:{ACCBG};--critical:{CRIT};--warning:{WARN}}}
-*{{box-sizing:border-box}}
-body{{background:#FFFFFF;color:var(--ink);font-family:'Be Vietnam Pro',system-ui,sans-serif;margin:0;line-height:1.55;font-size:15px}}
-.wrap{{max-width:1000px;margin:0 auto;padding:32px 20px 64px}}
-h1{{font-family:'Playfair Display',serif;font-weight:700;font-size:30px;line-height:1.2;margin:0 0 6px}}
-h2{{font-family:'Playfair Display',serif;font-weight:600;font-size:19px;margin:0}}
-.masthead{{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:8px}}
-.meta{{color:var(--muted);font-size:13px;margin-top:8px}}
-.verdict{{background:var(--accent-bg);border:1px solid var(--accent);border-radius:8px;padding:18px 20px;margin:22px 0}}
-.verdict .lead{{font-family:'Playfair Display',serif;font-size:20px;color:var(--accent);font-weight:600;margin:0 0 6px}}
-.verdict p{{margin:6px 0 0}}
-.legend-note{{font-size:12.5px;color:var(--ink-soft);margin:14px 0 0;padding:9px 13px;background:var(--surface);border:1px solid var(--rule);border-radius:6px}}
-.sw{{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:baseline;margin:0 3px 0 8px}}
-.kpirow{{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}}
-.kpi{{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}}
-.kpi.crit{{border-left:3px solid var(--critical)}} .kpi.warn{{border-left:3px solid var(--warning)}}
-.kv{{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}}
-.kpi.crit .kv{{color:var(--critical)}} .kpi.warn .kv{{color:var(--warning)}}
-.kl{{color:var(--muted);font-size:12.5px;margin-top:4px}}
-.card{{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:20px 22px;margin:16px 0}}
-.chd{{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}}
-.tag{{font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:20px;padding:2px 10px;white-space:nowrap}}
-.sub{{color:var(--ink-soft);font-size:13.5px;margin:4px 0 14px}}
-.note{{background:var(--surface);border-left:3px solid var(--warning);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13.5px;color:var(--ink-soft);margin-top:14px}}
-.note.crit{{border-left-color:var(--critical)}}
-table{{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}}
-th,td{{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule)}}
-td.n,th.n{{text-align:right;font-variant-numeric:tabular-nums}}
-thead th{{background:var(--surface);color:var(--ink-soft);font-weight:600}}
-.neg{{color:var(--critical)}}
-.q{{border:1px solid var(--rule);border-radius:8px;padding:14px 16px 14px 46px;margin:10px 0;position:relative;background:var(--surface);counter-increment:q}}
-.qbox{{counter-reset:q}}
-.q:before{{content:counter(q);position:absolute;left:14px;top:14px;width:22px;height:22px;background:var(--accent);color:#fff;border-radius:50%;text-align:center;line-height:22px;font-size:13px;font-weight:600}}
-.q .qh{{font-weight:600}}
-.qm{{color:var(--muted);font-size:12.5px;display:block;margin-top:4px}}
-.qm b{{color:var(--ink-soft);font-weight:600}}
-.gate td:first-child{{font-weight:600;white-space:nowrap;color:var(--accent)}}
-.gate td{{vertical-align:top}}
-.two{{display:grid;grid-template-columns:1fr 1fr;gap:16px}}
-.foot{{color:var(--muted);font-size:12px;margin-top:28px;border-top:1px solid var(--rule);padding-top:14px}}
-@media (max-width:720px){{.kpirow{{grid-template-columns:1fr 1fr}}.two{{grid-template-columns:1fr}}h1{{font-size:24px}}}}
-@media print{{body{{font-size:12px}}.wrap{{max-width:none;padding:0}}.card,.kpi,.verdict,.note,.q,.legend-note{{background:#fff!important;break-inside:avoid}}.kv{{color:var(--ink)!important}}:root{{--muted:#222;--ink-soft:#222}}.tag{{color:#222;border-color:#222}}}}
-</style></head>
+{page_style()}</head>
 <body><div class="wrap">
 
 <div class="masthead">
@@ -198,7 +155,7 @@ Nguồn: Tờ trình KHKD 27/05/2026 + Báo cáo sử dụng ngân sách {PER}. 
 <p>Đơn vị chưa chứng minh cầu ở quy mô nền: doanh thu = <b>{pctv(dt_lk/dt_kh*100)} kế hoạch năm</b>, lỗ gộp âm, đốt <b>{vnd(H['cf_lk'])}</b> tiền mặt sau {_mm-2} tháng. Toàn bộ kế hoạch đặt cược vào cú hích cuối năm gấp <b>{mult(surge_x)}</b> run-rate hiện tại. Cơ chế đúng là <b>rót vốn theo cổng kiểm soát 90 ngày</b>, không phê duyệt trọn gói.</p>
 </div>
 
-<div class="legend-note"><b>Quy ước màu (mọi biểu đồ):</b> <span class="sw" style="background:{PLAN}"></span> xanh = <b>Kế hoạch</b>, <span class="sw" style="background:{ACT}"></span> đỏ = <b>Thực hiện lũy kế {ASOF}</b>. Mọi biểu đồ đặt cạnh nhau ngân sách vs thực chi/thực thu để đối chiếu trực tiếp.</div>
+<div class="legend-note"><b>Quy ước màu (mọi biểu đồ):</b> <span class="sw" style="background:var(--accent)"></span> xanh = <b>Kế hoạch</b>, <span class="sw" style="background:var(--critical-fill)"></span> đỏ = <b>Thực hiện lũy kế {ASOF}</b>. Mọi biểu đồ đặt cạnh nhau ngân sách vs thực chi/thực thu để đối chiếu trực tiếp.</div>
 
 <div class="kpirow">{kpis}</div>
 
@@ -220,7 +177,7 @@ Nguồn: Tờ trình KHKD 27/05/2026 + Báo cáo sử dụng ngân sách {PER}. 
 {card("8 · Stress test lỗ CẢ NĂM 2026: Kế hoạch vs Kịch bản","Bốn kịch bản trên cùng một cơ sở 12 tháng: Kế hoạch (Lạc quan, xanh) so với các kịch bản theo quỹ đạo thực. Giữ chi phí lỗ nặng hơn kế hoạch; chỉ cắt giảm mới kéo về vùng đã duyệt.",c8+f'<div class="note"><b>Ghi chú kỳ:</b> lỗ thực lũy kế ({vnd(net_lk)}) KHÔNG đặt cạnh đây để tránh so lệch kỳ (lũy kế vs cả năm) — nó nằm ở biểu đồ #5. Kịch bản là lớp phán quyết, rà soát thủ công gần nhất {REVIEW_ASOF}.</div>')}
 
 {card("Bảng P&L chuẩn hóa — Kế hoạch vs Thực hiện", None, f'''
-<table><thead><tr><th>Chỉ tiêu</th><th class="n">Kế hoạch 2026</th><th class="n">TH đến {ASOF}</th><th class="n">% đạt</th></tr></thead><tbody>
+<div style="overflow-x:auto"><table><thead><tr><th>Chỉ tiêu</th><th class="n">Kế hoạch 2026</th><th class="n">TH đến {ASOF}</th><th class="n">% đạt</th></tr></thead><tbody>
 <tr><td>Doanh thu</td><td class="n">{vnd(dt_kh)}</td><td class="n">{vnd(dt_lk)}</td><td class="n neg">{pctv(dt_lk/dt_kh*100)}</td></tr>
 <tr><td>Giá vốn (COGS)</td><td class="n">{vnd(cogs_kh)}</td><td class="n">{vnd(cogs_lk)}</td><td class="n">{pctv(cogs_lk/cogs_kh*100)}</td></tr>
 <tr><td>Lợi nhuận gộp</td><td class="n">{vnd(gp_kh)}</td><td class="n neg">({vnd(abs(gp_lk))})</td><td class="n neg">biên âm</td></tr>
@@ -229,7 +186,7 @@ Nguồn: Tờ trình KHKD 27/05/2026 + Báo cáo sử dụng ngân sách {PER}. 
 <tr><td><b>Lợi nhuận ròng</b></td><td class="n neg">({vnd(abs(net_kh))})</td><td class="n neg">({vnd(abs(net_lk))})</td><td class="n">–</td></tr>
 <tr><td>Dòng tiền thuần</td><td class="n neg">({vnd(abs(H['cf_kh']))})</td><td class="n neg">({vnd(abs(H['cf_lk']))})</td><td class="n">{d0(H['cf_lk']/H['cf_kh']*100)}% NS</td></tr>
 <tr><td>CAPEX giải ngân</td><td class="n">{vnd(H['capex_kh'])}</td><td class="n">{vnd(H['capex_lk'])}</td><td class="n">{pctv(H['capex_lk']/H['capex_kh']*100)}</td></tr>
-</tbody></table>
+</tbody></table></div>
 <div class="note crit"><b>Đọc nhanh:</b> đơn vị đã tiêu {d0(H['cf_lk']/H['cf_kh']*100)}% ngân sách tiền mặt và {d0(_ns['lk']/_ns['kh']*100)}% quỹ lương cả năm, nhưng mới thu {pctv(dt_lk/dt_kh*100)} doanh thu. Lỗ gộp âm nghĩa là bán một đồng đang lỗ trực tiếp, trước cả lương và mặt bằng.</div>
 ''')}
 
