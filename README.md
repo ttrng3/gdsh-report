@@ -2,6 +2,8 @@
 
 Live dashboard: **https://ttrng3.github.io/gdsh-report/**
 
+Board brief (BLĐ, 25/09/2026): **https://ttrng3.github.io/gdsh-report/brief/** — hand-written, lives in `brief/`, not touched by the routine or `publish.yml`.
+
 **This repo is the source of truth.** A cloud routine writes `data/` and GitHub
 Pages serves it. `docs/gdsh-refresh.md` is the runbook and outranks the routine
 prompt and any stored memory.

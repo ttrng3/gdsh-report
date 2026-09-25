@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>GDSH Board Brief</title>
+<style>
+body{margin:0}
+:root{--page:#F2F2F7;--card:#FFFFFF;--line:#E5E5EA;--ink:#1C1C1E;--ink2:#3C3C43;--ink3:#8E8E93;--accent:#0A60D0;--accent-ink:#0A4FA8;--accent-bg:#EAF2FE;--green:#1E7B34;--amber:#A05A00;--red:#C4281C;color-scheme:light}
+html,body{background:var(--page)}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;color:var(--ink2);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased;padding-inline:16px;padding-block:28px 64px}
+.wrap{max-width:880px;margin:0 auto;display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}.wrap>*{min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 26px}
+h1{color:var(--ink);font-size:1.55rem;line-height:1.25;margin:4px 0 12px;letter-spacing:-.01em;text-wrap:balance}
+h2{color:var(--ink);font-size:1.08rem;margin:0 0 4px;text-wrap:balance}
+.eyebrow{font-size:.74rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:2px}
+.lead{color:var(--ink3);font-size:.88rem;margin:0 0 14px}
+p{margin:0 0 10px}p:last-child{margin-bottom:0}
+strong{color:var(--ink);font-weight:600}
+.meta{color:var(--ink3);font-size:.84rem}
+.ask{background:var(--accent-bg);border-radius:12px;padding:16px 18px;color:var(--ink);margin-top:16px}
+.ask .t{color:var(--accent-ink);font-weight:700;margin-bottom:8px}
+.ask ol{margin:0;padding-left:20px}.ask li{margin:0 0 6px}.ask li:last-child{margin:0}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.kpi{border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi .v{color:var(--ink);font-size:1.45rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .l{font-size:.82rem;color:var(--ink2);margin-top:5px}
+.kpi .s{font-size:.74rem;color:var(--ink3);margin-top:6px}
+.tag{font-size:.7rem;color:var(--ink3);border:1px solid var(--line);border-radius:6px;padding:0 5px;white-space:nowrap}
+.st{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.82rem;white-space:nowrap}
+.st::before{content:"";width:8px;height:8px;border-radius:50%;flex:none}
+.st.g{color:var(--green)}.st.g::before{background:#34C759}
+.st.a{color:var(--amber)}.st.a::before{background:#FF9500}
+.st.r{color:var(--red)}.st.r::before{background:#FF3B30}
+ul,ol{margin:0;padding-left:20px}li{margin:0 0 8px}li:last-child{margin-bottom:0}
+.tw{overflow-x:auto;margin:6px 0 12px}
+table{border-collapse:collapse;width:100%;font-size:.87rem;font-variant-numeric:tabular-nums}
+th{color:var(--ink3);text-align:left;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.r,th.r{text-align:right;white-space:nowrap}
+tr.rec td{background:var(--accent-bg)}tr.rec td:first-child{color:var(--accent-ink)}
+.mn{min-width:640px}
+.note{font-size:.84rem;color:var(--ink3)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.two h3{color:var(--ink);font-size:.92rem;margin:0 0 8px}
+details{font-size:.88rem;border-top:1px solid var(--line);padding-top:12px;margin-top:14px}
+summary{cursor:pointer;color:var(--ink2);font-weight:600}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
+.apx{font-size:.8rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);padding:14px 4px 0}
+tr.tot td{color:var(--ink);font-weight:600}
+.neg{color:var(--red)}
+table.fx{table-layout:fixed;min-width:620px}table.fx th:first-child{width:17%}
+h2+p strong{color:var(--ink)}
+.foot{font-size:.8rem;color:var(--ink3);text-align:center;padding:4px 0}
+@media (max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.card{padding:18px 16px}}
+@media print{html,body{background:#fff}body{padding:0;font-size:10.5pt}.card,.kpi,tr{break-inside:avoid}.card,.kpi{border-color:#ccc}:root{--ink2:#222;--ink3:#222}.ask,tr.rec td{background:#fff}.ask{border:1px solid #ccc}details>*{display:block}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<section class="card">
+  <div class="meta">Kính gửi HĐQT, Chủ tịch và BLĐ · Người lập: Ty Truong, Thường trực KSNB &amp; QTRR · 25/09/2026 · Số liệu đến 31/08, công nợ đến 21/09</div>
+  <h1>Giáo dục Sông Hồng chưa tự đứng được về tài chính. Đề xuất: cấp vốn theo từng đợt gắn với mốc kết quả, đi kèm tái cấu trúc</h1>
+  <p>Sau 6 tháng, GDSH đã dựng xong nền móng nhưng số khách trả tiền còn rất thấp. Đến 31/08, tiền thu từ khách mới đạt 5% kế hoạch cả năm, trong khi chi vận hành đã dùng 45% và đầu tư 44%. Mảng khóa học có <strong>25 học viên đóng phí</strong>, so với kế hoạch 2026 là 1.116. Kế hoạch 2026 được duyệt với mức lỗ 6,29 tỷ ngay cả khi đạt 100%, nên cấp thêm vốn mà không thay đổi cách vận hành sẽ chỉ kéo dài khoản lỗ. Theo ước tính, giữ nguyên cần khoảng <strong>8,2 tỷ</strong> trong 12 tháng tới; tái cấu trúc và cấp vốn theo mốc cần khoảng <strong>2,9 tỷ</strong>, chia 3 đợt.</p>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">1,89 tỷ</div><div class="l">Tiền dùng được</div><div class="s">3,29 tỷ tiền − 1,39 tỷ công nợ đã cam kết</div></div>
+    <div class="kpi"><div class="v">~840 tr</div><div class="l">Tiền mặt chi ròng mỗi tháng</div><div class="s">giáo dục ~585 tr + hai khu vui chơi lỗ 253 tr (T8)</div></div>
+    <div class="kpi"><div class="v">~07/11</div><div class="l">Dự kiến hết tiền, còn ~6 tuần</div><div class="s">nếu giữ mức chi tháng 8 và trả hết công nợ</div></div>
+    <div class="kpi"><div class="v">25 / 1.116</div><div class="l">Học viên khóa học đóng phí / kế hoạch 2026</div><div class="s">không tính lượt trải nghiệm, suất thi IELTS, trại hè</div></div>
+  </div>
+  <p class="note" style="margin-top:12px">Số liệu hai khu vui chơi tháng 7–8 lấy từ báo cáo nhanh của GDSH, chưa có sổ chi tiết. Đề nghị GDSH gửi số dư ngân hàng và sổ chi tiết hai khu vui chơi đến ngày họp để chốt lại mốc hết tiền.</p>
+
+  <div class="ask">
+    <div class="t">BLĐ cần quyết 4 việc</div>
+    <ol>
+      <li><strong>Tuần này:</strong> đóng băng 3,14 tỷ đầu tư còn lại; mọi khoản chi trên 20 tr cần hai chữ ký, một người thuộc HĐQT.</li>
+      <li><strong>Tuần này:</strong> không thanh toán, không hoàn ứng khoản 300 tr chi chưa có chứng từ cho đến khi Pháp chế có ý kiến bằng văn bản.</li>
+      <li><strong>Tuần này:</strong> cử một thành viên HĐQT làm đầu mối theo dõi các mốc giải ngân và làm việc với chủ đầu tư về hợp đồng dịch vụ tiện ích.</li>
+      <li><strong>Trước 01/11:</strong> duyệt chủ trương phương án B + C (khoảng 2,9 tỷ chia 3 đợt) và giải ngân đợt 1 (1,0 tỷ) khi GDSH đạt đủ điều kiện. Số tiền các đợt sau được điều chỉnh theo dự báo dòng tiền 13 tuần do GDSH lập.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="card">
+  <div class="eyebrow">Định hướng ban đầu</div>
+  <h2>Tiện ích là nam châm kéo gia đình và cư dân về Eco Central Park</h2>
+  <p>Theo định hướng của Chủ tịch, giáo dục và khu vui chơi là những tiện ích kéo gia đình trẻ và cư dân về khu đô thị. Tờ trình kế hoạch kinh doanh 2026 cụ thể hóa định hướng này: <em>"tạo nên một tổ hợp đào tạo hỗn hợp đa năng, phục vụ cư dân khu đô thị và cả cư dân tại trung tâm Thành phố Vinh (cũ) cũng như các khu vực lân cận"</em>, với khẩu hiệu "Khai Mở Tri Thức, Kiến Tạo Sống Xanh".</p>
+  <p>Vì vậy GDSH nên được nhìn bằng hai thước đo. Thước đo thứ nhất là <strong>kéo được gia đình đến</strong>: đã có tín hiệu, với 716 học sinh từ 8 đơn vị trường học trong mùa hè và khu vui chơi Vinh xuất 5.300–7.200 hóa đơn mỗi tháng trong T4–T6. Thước đo thứ hai là <strong>tự đứng được về tài chính</strong>: chưa đạt. Đề xuất dưới đây giữ vai trò tiện ích, đồng thời đưa phần hỗ trợ cho vai trò đó vào một cơ chế rõ ràng.</p>
+</section>
+
+<section class="card">
+  <div class="eyebrow">Bức tranh</div>
+  <h2>Từng mảng đang ở đâu</h2>
+  <p class="lead">Mỗi dòng một mảng: kết quả thật theo sổ sách và hướng xử lý.</p>
+  <div class="tw"><table class="mn">
+    <thead><tr><th style="width:17%">Mảng</th><th style="width:15%">Tình trạng</th><th>Số liệu chính</th><th style="width:27%">Hướng xử lý</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Khóa học</strong></td><td><span class="st r">Rất yếu</span></td><td>25 học viên, học phí thu được 318 tr. Chi phí nhân sự mảng giáo dục gấp 14,8 lần doanh thu.</td><td>Định biên lại theo học viên thật; đưa chi cố định (725 tr trong tháng 8) về đúng quy mô</td></tr>
+      <tr><td><strong>Hợp đồng British Council</strong></td><td><span class="st r">Chi lớn hơn thu</span></td><td>Đã trả và còn nợ tổng ~1,67 tỷ để thu 251 tr học phí: <strong>6,6 đồng chi cho mỗi đồng thu</strong>.</td><td>Đàm phán giãn 725 tr còn lại, thu hẹp về số lớp có học viên</td></tr>
+      <tr><td><strong>Đoàn trường</strong></td><td><span class="st a">Có khách, ít tiền</span></td><td>716 học sinh trong T7–T8, doanh thu giáo dục 44 tr. Chưa đo được em nào đăng ký học tiếp.</td><td>Dồn vào tiểu học, THCS, trung tâm ngoại ngữ (giá gấp 3–6 lần mầm non)</td></tr>
+      <tr><td><strong>Khu vui chơi Vinh</strong></td><td><span class="st a">Có khách, cần tối ưu</span></td><td>Có khách thật mỗi ngày. T8 doanh thu 321 tr, lỗ 118 tr; chi phí nhân sự bằng 79% doanh thu.</td><td>Bố trí nhân sự theo giờ đông khách để về hòa vốn; dùng làm cửa đưa khách sang khóa học</td></tr>
+      <tr><td><strong>Khu vui chơi Long An</strong></td><td><span class="st a">Cần mô hình mới</span></td><td>Mới mở từ 26/04, lượng khách chưa ổn định. T8 doanh thu 92 tr, chưa đủ chi lương (~172 tr).</td><td>Mở vào cuối tuần, lễ và sự kiện; bố trí nhân sự theo ca đông khách; kết hợp đoàn trường và sự kiện cư dân; tìm đối tác cùng vận hành, chia doanh thu</td></tr>
+      <tr><td><strong>Kế toán, kiểm soát</strong></td><td><span class="st r">Cần xử lý gấp</span></td><td>300 tr chi không chứng từ; chưa có bảng cân đối; doanh thu IELTS T8 chưa ghi nhận; 141 tr chi ngoài ngân sách (part-time khai trương, trải nghiệm, thi robot); hai khu vui chơi mới có báo cáo dạng biểu đồ.</td><td>Chuyển Pháp chế; thêm một người chuyên hóa đơn, chứng từ</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="two">
+    <div>
+      <h3><span class="st g">Đã làm được</span></h3>
+      <ul>
+        <li>Khai trương đúng 13/06, chưa đến 3 tháng sau khi nhận vốn, đủ pháp nhân và hóa đơn điện tử.</li>
+        <li>Có British Council làm đối tác, lợi thế khó sao chép ở Vinh.</li>
+        <li>8 đơn vị trường học đã gửi đoàn ngay mùa hè đầu tiên.</li>
+        <li>Tiếp nhận hai khu vui chơi nhanh; tiền gửi và tiền mặt khớp sổ ngân hàng.</li>
+        <li>Hai cổ đông cá nhân góp 1 tỷ tiền riêng và đang tạm ứng thêm.</li>
+        <li>Chưa dùng đến khoản chi phí dự phòng.</li>
+      </ul>
+    </div>
+    <div>
+      <h3><span class="st a">Còn khó</span></h3>
+      <ul>
+        <li>Chi trước khi có khách: xe Hilux 957,9 tr (gồm trước bạ), khai trương 312,9 tr, trong khi marketing mới chi 42,8 tr.</li>
+        <li>Chỉ tiêu 11.196 "học sinh" đang tính chung 8.800 lượt trải nghiệm với học viên khóa học. Nên tách riêng hai chỉ số để theo dõi đúng số học viên đóng phí.</li>
+        <li>Hai khu vui chơi không nằm trong báo cáo ngân sách của GDSH.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="eyebrow">Vì sao</div>
+  <h2>Vấn đề nằm ở mô hình, cắt chi phí thôi chưa đủ</h2>
+  <p class="lead">Ba nguyên nhân gốc, xếp theo mức ảnh hưởng.</p>
+  <ol>
+    <li><strong>Mô hình được định cỡ lớn hơn nhu cầu hiện có.</strong> Kế hoạch 2026 lỗ 6,29 tỷ kể cả khi đạt 100%. Chi vận hành gần như cố định theo bộ máy, không điều chỉnh theo doanh thu: so với ngân sách cùng kỳ T3–T8, chi vận hành đã dùng 72%, doanh thu mới đạt 10,2%.</li>
+    <li><strong>Chưa có cơ chế gắn chi với bán.</strong> Ngân sách duyệt một lần cho cả năm, giải ngân theo hạng mục thay vì theo mốc doanh thu. Phần hỗ trợ cho vai trò tiện ích của khu đô thị hiện chưa có cơ chế riêng, nên đang nằm lẫn trong vốn điều lệ.</li>
+    <li><strong>Hai mảng chưa nối với nhau.</strong> Khu vui chơi Vinh có khách mỗi ngày, tầng trên là lớp học còn trống chỗ, nhưng chưa có phiếu học thử, mã khách chung hay số đo chuyển đổi nào.</li>
+  </ol>
+</section>
+
+<section class="card">
+  <div class="eyebrow">Tăng học viên</div>
+  <h2>Nối khu vui chơi Vinh với lớp học: làm được ngay, không cần đầu tư thêm</h2>
+  <p class="lead">Kế hoạch 30 ngày; tuần 1 là tuần ngay sau khi BLĐ đồng ý.</p>
+  <div class="tw"><table class="mn">
+    <thead><tr><th>Việc</th><th style="width:32%">Người phụ trách</th><th class="r" style="width:12%">Tuần</th></tr></thead>
+    <tbody>
+      <tr><td>Làm phiếu học thử và mã QR giữ chỗ trên phần mềm đang dùng; mỗi gia đình một mã khách chung</td><td>Sale – Marketing, IT</td><td class="r">1</td></tr>
+      <tr><td>Phát phiếu học thử kèm mỗi vé vào cửa khu vui chơi</td><td>Quản lý khu vui chơi Vinh</td><td class="r">2</td></tr>
+      <tr><td>Đặt bàn tư vấn ở cửa khu vui chơi chiều thứ Bảy, Chủ nhật</td><td>Trưởng phòng Sale – Marketing</td><td class="r">2 trở đi</td></tr>
+      <tr><td>Mở buổi học thử Robotics và Tiếng Anh sáng thứ Bảy, Chủ nhật</td><td>GĐ TT Robotics, GĐ TT Ngoại ngữ</td><td class="r">2 trở đi</td></tr>
+      <tr><td>Ưu đãi vé khu vui chơi cho gia đình học viên đóng phí</td><td>Quản lý khu vui chơi, Kế toán</td><td class="r">3</td></tr>
+      <tr><td>Báo cáo mỗi thứ Hai: phiếu phát ra, số em học thử, số em đăng ký, tiền mặt còn lại</td><td>Trợ lý TGĐ, gửi TGĐ và HĐQT</td><td class="r">2 trở đi</td></tr>
+    </tbody>
+  </table></div>
+  <p>Khu vui chơi Vinh xuất 5.300–7.200 hóa đơn mỗi tháng trong T4–T6, trong khi cả mảng khóa học mới có 25 học viên. Sau 30 ngày, tỷ lệ từ phiếu phát ra đến đăng ký sẽ cho biết kênh này đóng góp được bao nhiêu.</p>
+</section>
+
+<section class="card">
+  <div class="eyebrow">Phương án</div>
+  <h2>So sánh các hướng xử lý</h2>
+  <p class="lead">Vốn cần thêm là ước tính cho 12 tháng tới (T9/2026–T8/2027), dựa trên số thực tế tháng 8; giả định ở phần mở rộng bên dưới.</p>
+  <div class="tw"><table class="mn">
+    <thead><tr><th style="width:32%">Phương án</th><th class="r" style="width:16%">Vốn cần thêm</th><th>Đánh đổi</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A.</strong> Giữ nguyên, cấp vốn khi cần</td><td class="r">~8,2 tỷ</td><td>Không phải thay đổi gì ngay, nhưng lỗ tiếp tục (~840 tr tiền mặt mỗi tháng, gồm hai khu vui chơi) và chưa có điểm dừng</td></tr>
+      <tr><td><strong>B.</strong> Tái cấu trúc, cấp vốn theo mốc</td><td class="r">~2,9 tỷ</td><td>Phải sắp xếp lại nhân sự và cách vận hành; kết quả phụ thuộc vào tốc độ tăng học viên</td></tr>
+      <tr class="rec"><td><strong>B + C.</strong> Như B, cộng hợp đồng dịch vụ tiện ích với chủ đầu tư (đề xuất)</td><td class="r">~2,9 tỷ năm đầu</td><td>Giữ đúng vai trò tiện ích theo định hướng ban đầu. Phần hỗ trợ của chủ đầu tư có hợp đồng, có mức trần và sản phẩm bàn giao, thay vì bù qua vốn điều lệ; cần định giá minh bạch</td></tr>
+      <tr><td><strong>D.</strong> Giao một hệ thống giáo dục khác vận hành</td><td class="r">gần 0</td><td>Ít rủi ro tài chính, nhưng mất quyền chủ động về chất lượng và thương hiệu</td></tr>
+      <tr><td><strong>E.</strong> Dừng hoạt động</td><td class="r">đóng cửa + nợ</td><td>Vẫn phải trả 1,39 tỷ công nợ và chi phí đóng cửa; tòa nhà giáo dục bỏ trống giữa khu dân cư</td></tr>
+    </tbody>
+  </table></div>
+  <p>Sau 12 tháng tái cấu trúc, tiền thu vẫn chưa đủ bù chi phí ở các tháng ngoài mùa cao điểm. Phần thiếu này là lý do đề xuất thêm hợp đồng dịch vụ tiện ích (C), để phần hỗ trợ từ năm thứ hai có hợp đồng và mức trần rõ ràng.</p>
+  <details>
+    <summary>Giả định của ước tính</summary>
+    <ul style="margin-top:8px">
+      <li><strong>Đầu kỳ:</strong> tiền 3.286 tr tại 31/08; trả hết 1.393 tr công nợ trong T9–T11 (British Council và GDVN trong T10).</li>
+      <li><strong>Phương án A:</strong> giữ chi cố định 725 tr/tháng như tháng 8; tiền thu từ 150 tr/tháng (mức tháng 8), tăng 5% mỗi tháng; hai khu vui chơi lỗ 253 tr/tháng như tháng 8.</li>
+      <li><strong>Phương án B, chi phí:</strong> chi cố định giảm từ 725 xuống 600 tr từ T11 (dừng nhà công vụ, xe, part-time ngoài ngân sách), rồi 480 tr từ T1/2027 (định biên theo học viên); chi phí tái cấu trúc một lần 200 tr; bán xe Hilux thu khoảng 700 tr trong T12 (giá mua 957,9 tr).</li>
+      <li><strong>Phương án B, tiền thu:</strong> tăng dần từ 150 tr lên khoảng 340 tr/tháng vào T5/2027 nhờ nối khu vui chơi với lớp học và dồn đoàn trường vào tiểu học, THCS; trại hè 2027 khoảng 420 tr/tháng trong T6–T7 (hè 2026: 10 em, 91,8 tr). Chi phí biến đổi 30% tiền thu.</li>
+      <li><strong>Phương án B, khu vui chơi:</strong> Vinh giảm lỗ dần và theo mùa như năm 2026 (lãi dịp Tết và 30/4); Long An chuyển sang mở cuối tuần, lễ, sự kiện, lỗ giảm về khoảng 50 tr/tháng từ T11.</li>
+      <li><strong>Kết quả B:</strong> tiền âm sâu nhất khoảng 2,4 tỷ vào T8/2027; cộng 0,5 tỷ dự phòng, làm tròn 2,9 tỷ.</li>
+      <li><strong>Độ nhạy:</strong> không bán được xe, hoặc tiền thu chỉ đạt 70% giả định: cần khoảng 3,6 tỷ (gồm dự phòng). Tiền thu đạt 50%: khoảng 4,1 tỷ. Nếu Pháp chế kết luận không thanh toán khoản 300 tr, hoặc giãn được một phần 725 tr cho British Council, con số giảm tương ứng.</li>
+    </ul>
+  </details>
+</section>
+
+<section class="card">
+  <div class="eyebrow">Cơ chế hỗ trợ</div>
+  <h2>Khoảng 2,9 tỷ chia 3 đợt, mỗi đợt có điều kiện</h2>
+  <p class="lead">Điều kiện dưới đây là đề xuất để BLĐ cân nhắc. Trượt bất kỳ mốc nào quá 30 ngày thì dừng giải ngân để BLĐ xem xét lại hướng xử lý.</p>
+  <div class="tw"><table class="mn">
+    <thead><tr><th style="width:8%">Đợt</th><th class="r" style="width:11%">Số tiền</th><th>GDSH phải đạt trước khi nhận tiền</th><th style="width:15%">Thời điểm</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="r">1,0 tỷ</td><td>Dự báo dòng tiền 13 tuần có cả hai khu vui chơi; sổ chi tiết hai khu vui chơi; đầu tư đã đóng băng; Pháp chế có ý kiến về khoản 300 tr; có phương án vận hành mới cho Long An; HĐQT duyệt định biên mới</td><td>trước 01/11/2026</td></tr>
+      <tr><td>2</td><td class="r">1,0 tỷ</td><td>Chi cố định ≤ 560 tr/tháng (từ 725 tr); ≥ 80 học viên đóng phí; khu Vinh có phương án hòa vốn được duyệt; xe đã bán</td><td>~T2/2027</td></tr>
+      <tr><td>3</td><td class="r">0,9 tỷ</td><td>≥ 150 học viên; trại hè 2027 bán trước; đã ký hợp đồng dịch vụ tiện ích</td><td>~T6/2027</td></tr>
+    </tbody>
+  </table></div>
+  <p>Hai điều kiện về khoản 300 tr và dòng tiền 13 tuần không nên nới. Nếu BLĐ thấy đợt 1 quá chặt, có thể dời điều kiện định biên sang đợt 2.</p>
+</section>
+
+<section class="card">
+  <div class="eyebrow">Rủi ro</div>
+  <h2>Điều gì làm kế hoạch trượt, và dấu hiệu nhận biết</h2>
+  <div class="tw"><table class="mn">
+    <thead><tr><th style="width:36%">Rủi ro</th><th>Dấu hiệu sớm</th><th style="width:28%">Xử lý</th></tr></thead>
+    <tbody>
+      <tr><td>Khách khu vui chơi không chuyển thành học viên như kỳ vọng.</td><td>Sau 30 ngày phát phiếu học thử, số đăng ký gần như không tăng</td><td>Mốc đợt 2 (≥ 80 học viên) chặn lại để BLĐ xem xét hướng khác</td></tr>
+      <tr><td>Tiền hết sớm hơn dự kiến. Số hai khu vui chơi mới đọc từ biểu đồ; tài khoản thanh toán chỉ có 0,69 tỷ tại 31/08, phần còn lại là sổ tiết kiệm 2,6 tỷ.</td><td>Chưa có dự báo dòng tiền 13 tuần và số dư ngân hàng hiện tại</td><td>Không giải ngân cho đến khi có</td></tr>
+      <tr><td>Khoản 300 tr, và 157,5 tr trả cho một công ty khác theo số hợp đồng British Council, trở thành rủi ro pháp lý, thuế</td><td>Không có danh sách người nhận, người duyệt</td><td>Pháp chế và Kế toán trưởng xem trước mọi thanh toán</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Nên nghe trực tiếp từ TGĐ GDSH trong buổi khảo sát: cần bao nhiêu tiền, định biên đề xuất, kế hoạch đến mùa tuyển sinh, và đội ngũ muốn cắt gì trước. Một kế hoạch do đội ngũ tự đề xuất sẽ được thực thi tốt hơn một kế hoạch bị áp xuống.</p>
+</section>
+
+<div class="apx">Phụ lục: số liệu chi tiết</div>
+<section class="card">
+  <h2>Học sinh theo khóa và theo tháng</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Chương trình</th><th class="r">Đăng ký T6</th><th class="r">Đăng ký T7</th><th class="r">Đăng ký T8</th><th class="r">Tổng</th><th class="r">Học phí đã thu</th></tr></thead>
+    <tbody>
+      <tr><td>Tiếng Anh British Council</td><td class="r">–</td><td class="r">7</td><td class="r">8</td><td class="r">15</td><td class="r">251,4 tr</td></tr>
+      <tr><td>Robotics / AI (3 lớp)</td><td class="r">–</td><td class="r">10</td><td class="r">1</td><td class="r">11</td><td class="r">59,4 tr</td></tr>
+      <tr><td>Học văn hóa</td><td class="r">–</td><td class="r">–</td><td class="r">2</td><td class="r">2</td><td class="r">7,0 tr</td></tr>
+      <tr class="tot"><td>Khóa học (lượt đăng ký)</td><td class="r">–</td><td class="r">17</td><td class="r">11</td><td class="r">28</td><td class="r">317,8 tr</td></tr>
+      <tr><td>Trại hè</td><td class="r">10</td><td class="r">–</td><td class="r">–</td><td class="r">10</td><td class="r">91,8 tr</td></tr>
+      <tr><td>Đoàn trải nghiệm (học sinh)</td><td class="r">–</td><td class="r">618</td><td class="r">65</td><td class="r">683</td><td class="r">61,9 tr</td></tr>
+    </tbody>
+  </table></div>
+  <p>Cơ cấu tiền thu 472 tr: British Council 53,3%, trại hè 19,5%, trải nghiệm 13,1%, Robotics 12,6%, thu khác 1,5%. Đã đóng phí: 15 em tiếng Anh British Council, 11 em Robotics/AI, 2 em học văn hóa; 3 em học 2 khóa nên còn 25 học viên. Tổng tiền thu từ khách đến 31/08 là 471,5 tr, bằng khoảng 5% kế hoạch thu cả năm. Kênh đoàn trường đưa về 683 học sinh trong hai tháng hè (thêm 33 em chưa đủ hồ sơ ghi nhận), chủ yếu là trẻ mầm non với giá 45–70 nghìn/em. Hai đoàn có giá cao nhất là Tiểu học Bến Thủy (230 nghìn/em) và Galaxy English Center (280 nghìn/em).</p>
+  <p class="note">Số đăng ký tính theo tháng nộp học phí vào tài khoản công ty. Tiền thu 61,9 tr ở dòng trải nghiệm gồm cả các lớp ngắn hạn (nhảy hiện đại, MC).</p>
+</section>
+<section class="card">
+  <h2>Bức tranh tài chính của toàn đơn vị</h2>
+  <p><strong>Tình hình tài chính tại 31/08/2026</strong> (dựng lại từ sổ ngân hàng và báo cáo ngân sách; GDSH chưa lập bảng cân đối kế toán hằng tháng)</p>
+  <div class="tw"><table>
+    <thead><tr><th>Khoản mục</th><th class="r">Giá trị</th><th>Ghi chú</th></tr></thead>
+    <tbody>
+      <tr><td>Vốn điều lệ đã góp</td><td class="r">10,00 tỷ</td><td>Việt Lào 9,0 tỷ; Ô. Đặng Đình Tuyến 0,5 tỷ; Bà Âu Thúy Hiền 0,5 tỷ</td></tr>
+      <tr><td>Lỗ lũy kế</td><td class="r neg">(4,32) tỷ</td><td>Theo báo cáo kết quả kinh doanh</td></tr>
+      <tr class="tot"><td>Vốn chủ sở hữu còn lại</td><td class="r">5,68 tỷ</td><td></td></tr>
+      <tr><td>Tiền trên tài khoản thanh toán</td><td class="r">0,69 tỷ</td><td></td></tr>
+      <tr><td>Tiền gửi tiết kiệm</td><td class="r">2,60 tỷ</td><td>Gửi ngày 06/08</td></tr>
+      <tr class="tot"><td>Tổng tiền</td><td class="r">3,29 tỷ</td><td>Khớp số dư ngân hàng đến từng đồng</td></tr>
+      <tr><td>Công nợ nhà cung cấp phải trả trong 2026</td><td class="r neg">(1,39) tỷ</td><td>Chi tiết ở bảng dưới</td></tr>
+      <tr class="tot"><td>Tiền còn lại sau khi trả nợ</td><td class="r">1,89 tỷ</td><td></td></tr>
+      <tr><td>Tài sản cố định</td><td class="r">1,00 tỷ</td><td>Xe công vụ và thiết bị âm thanh; chưa trích khấu hao</td></tr>
+      <tr><td>Công cụ dụng cụ còn lại</td><td class="r">1,43 tỷ</td><td>Đã mua 1,48 tỷ (robot, thiết bị, phần mềm), đã phân bổ 46 tr vào chi phí</td></tr>
+      <tr><td>Chi phí Hội đồng Anh đã trả, chưa vào giá vốn</td><td class="r">0,52 tỷ</td><td>Đã chi 786,7 tr cho chương trình, mới ghi giá vốn 266,3 tr</td></tr>
+      <tr><td>Học phí đã thu trước</td><td class="r">0,27 tỷ</td><td>Phụ huynh đã đóng cho các buổi học chưa diễn ra (thu 471,5 tr, ghi doanh thu 199,2 tr)</td></tr>
+    </tbody>
+  </table></div>
+  <p style="margin-top:16px"><strong>Chi tiết 1,39 tỷ công nợ phải trả</strong> (theo file công nợ của kế toán ngày 21/09)</p>
+  <div class="tw"><table>
+    <thead><tr><th>Nhà cung cấp</th><th class="r">Số tiền</th><th>Nội dung</th></tr></thead>
+    <tbody>
+      <tr><td>British Council (Việt Nam)</td><td class="r">725,0 tr</td><td>Đợt còn lại theo hợp đồng hợp tác đào tạo</td></tr>
+      <tr><td>Khoản chi chưa đủ chứng từ</td><td class="r">300,0 tr</td><td>Cần Pháp chế xem trước khi thanh toán</td></tr>
+      <tr><td>Cty TNHH TM &amp; PT Giáo dục Việt Nam</td><td class="r">157,5 tr</td><td>Ghi theo cùng số hợp đồng với British Council</td></tr>
+      <tr><td>Cty TNHH Đầu tư và Phát triển DB</td><td class="r">103,0 tr</td><td>Điện nước khu vui chơi Long An tháng 7 và 8</td></tr>
+      <tr><td>Cty TNHH DV Ẩm thực Sông Lam</td><td class="r">102,4 tr</td><td>Hàng hóa chuyển giao cho hai khu vui chơi</td></tr>
+      <tr><td>4 nhà cung cấp khác</td><td class="r">5,2 tr</td><td>Vật tư, điện nước, khoản trả thiếu</td></tr>
+      <tr class="tot"><td>Cộng</td><td class="r">1.393,1 tr</td><td></td></tr>
+    </tbody>
+  </table></div>
+  <p>Khoảng 85% số nợ này nằm ở ba khoản: British Council, khoản 300 tr chưa đủ chứng từ và đơn vị ghi cùng hợp đồng British Council. Đây cũng là ba khoản BLĐ có thể xem xét lại trước khi thanh toán.</p>
+
+  <p style="margin-top:16px"><strong>Kết quả kinh doanh mảng giáo dục</strong> (triệu đồng)</p>
+  <div class="tw"><table>
+    <thead><tr><th>Tháng</th><th class="r">T3</th><th class="r">T4</th><th class="r">T5</th><th class="r">T6</th><th class="r">T7</th><th class="r">T8</th><th class="r">Lũy kế</th></tr></thead>
+    <tbody>
+      <tr><td>Doanh thu</td><td class="r">0</td><td class="r">0</td><td class="r">0</td><td class="r">68,9</td><td class="r">51,4</td><td class="r">79,0</td><td class="r">199,2</td></tr>
+      <tr><td>Trong đó: chi phí nhân sự</td><td class="r">391,7</td><td class="r">494,9</td><td class="r">558,3</td><td class="r">523,5</td><td class="r">450,3</td><td class="r">529,4</td><td class="r">2.948,1</td></tr>
+      <tr class="tot"><td>Lãi / lỗ</td><td class="r neg">−434,9</td><td class="r neg">−521,1</td><td class="r neg">−626,6</td><td class="r neg">−1.048,4</td><td class="r neg">−762,3</td><td class="r neg">−923,4</td><td class="r neg">−4.316,7</td></tr>
+    </tbody>
+  </table></div>
+  <p>Lũy kế đến 31/08: doanh thu 199,2 tr, giá vốn 588,4 tr, chi phí vận hành 3.927,5 tr, lỗ 4.316,7 tr. Riêng chi phí nhân sự là 2.948 tr, bằng gần 15 lần doanh thu. Ngoài ra đã chi 2.474 tr cho tài sản và công cụ dụng cụ. Tính cả tiền thu vào, dòng tiền thuần đến 31/08 là âm 6.774 tr trên 10 tỷ vốn góp.</p>
+
+  <p style="margin-top:16px"><strong>Khu vui chơi Vinh (Tom&amp;Jini)</strong> (triệu đồng)</p>
+  <div class="tw"><table class="fx"><thead><tr><th>Tháng</th><th class="r">T2</th><th class="r">T3</th><th class="r">T4</th><th class="r">T5</th><th class="r">T6</th><th class="r">T7*</th><th class="r">T8</th><th class="r">Lũy kế</th></tr></thead><tbody>
+  <tr><td>Doanh thu</td><td class="r">743,2</td><td class="r">443,9</td><td class="r">445,4</td><td class="r">747,1</td><td class="r">508,4</td><td class="r">405,0</td><td class="r">321,0</td><td class="r">3.614,0</td></tr>
+  <tr><td>Chi phí</td><td class="r">405,7</td><td class="r">372,5</td><td class="r">630,6</td><td class="r">518,9</td><td class="r">577,4</td><td class="r">668,0</td><td class="r">439,0</td><td class="r">3.612,1</td></tr>
+  <tr class="tot"><td>Lãi / lỗ</td><td class="r">+337,5</td><td class="r">+71,4</td><td class="r neg">−185,2</td><td class="r">+228,2</td><td class="r neg">−69,1</td><td class="r neg">−264,0</td><td class="r neg">−118,0</td><td class="r">+0,8</td></tr>
+  </tbody></table></div>
+  <p style="margin-top:16px"><strong>Khu vui chơi Long An (Eco Retreat), mở cửa 26/04</strong> (triệu đồng)</p>
+  <div class="tw"><table class="fx"><thead><tr><th>Tháng</th><th class="r">T2</th><th class="r">T3</th><th class="r">T4</th><th class="r">T5</th><th class="r">T6</th><th class="r">T7*</th><th class="r">T8</th><th class="r">Lũy kế</th></tr></thead><tbody>
+  <tr><td>Doanh thu</td><td class="r">–</td><td class="r">–</td><td class="r">151,3</td><td class="r">250,6</td><td class="r">127,7</td><td class="r">89,0</td><td class="r">92,0</td><td class="r">710,6</td></tr>
+  <tr><td>Chi phí</td><td class="r">–</td><td class="r">–</td><td class="r">276,0</td><td class="r">508,7</td><td class="r">293,7</td><td class="r">513,0</td><td class="r">227,0</td><td class="r">1.818,4</td></tr>
+  <tr class="tot"><td>Lãi / lỗ</td><td class="r">–</td><td class="r">–</td><td class="r neg">−124,7</td><td class="r neg">−258,0</td><td class="r neg">−166,0</td><td class="r neg">−424,0</td><td class="r neg">−135,0</td><td class="r neg">−1.107,7</td></tr>
+  </tbody></table></div>
+  <p style="margin-top:16px"><strong>Hai khu cộng lại</strong> (triệu đồng)</p>
+  <div class="tw"><table class="fx"><thead><tr><th>Tháng</th><th class="r">T2</th><th class="r">T3</th><th class="r">T4</th><th class="r">T5</th><th class="r">T6</th><th class="r">T7*</th><th class="r">T8</th><th class="r">Lũy kế</th></tr></thead><tbody>
+  <tr><td>Doanh thu</td><td class="r">743,2</td><td class="r">443,9</td><td class="r">596,7</td><td class="r">997,7</td><td class="r">636,1</td><td class="r">494,0</td><td class="r">413,0</td><td class="r">4.324,6</td></tr>
+  <tr class="tot"><td>Lãi / lỗ</td><td class="r">+337,5</td><td class="r">+71,4</td><td class="r neg">−309,9</td><td class="r neg">−29,8</td><td class="r neg">−235,1</td><td class="r neg">−688,0</td><td class="r neg">−253,0</td><td class="r neg">−1.106,9</td></tr>
+  </tbody></table></div>
+  <p>T2 đến T6 do Sông Lam vận hành; GDSH tiếp nhận khu Vinh từ giữa T7 và khu Long An từ T8. Khu Vinh lãi vào Tết (T2), T3 và dịp 30/4 (T5), lỗ ở T4 và T6. Sau khi về GDSH, tháng 8 dù là mùa hè vẫn lỗ 118 tr; chi phí nhân sự khoảng 254 tr, bằng 79% doanh thu. Khu Long An lỗ từ tháng đầu tiên; tháng 8 doanh thu 92 tr, chi phí nhân sự khoảng 172 tr.</p>
+  <p class="note">T2–T6 theo báo cáo P&amp;L của Sông Lam (22/09), chưa tính tiền thuê mặt bằng. *T7 là tháng chuyển giao; T7 và T8 theo báo cáo nhanh của GDSH (số đọc từ biểu đồ, chưa có sổ chi tiết). Long An T7 theo Sông Lam là doanh thu 57,9 tr, lỗ 41,1 tr; theo GDSH là 89 tr, lỗ 424 tr (gồm khoảng 255 tr công cụ dụng cụ). Hai bên cần đối chiếu.</p>
+</section>
+<p class="note" style="padding:0 4px">Toàn bộ phân tích, danh sách chi tiêu cần giải trình và mô hình 12 tháng nằm trong báo cáo thẩm định chi tiết v2.2, gửi kèm riêng.</p>
+
+<div class="foot">Báo cáo nội bộ. Nội dung pháp lý, thuế, lao động và giao dịch bên liên quan cần Pháp chế và Kế toán trưởng xác nhận trước khi thực hiện.</div>
+</div>
+
+</body>
+</html>
