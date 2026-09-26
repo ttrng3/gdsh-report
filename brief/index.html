@@ -7,6 +7,7 @@
 <title>GDSH Board Brief</title>
 <style>
 body{margin:0}
+html{scroll-behavior:smooth}
 :root{--page:#F2F2F7;--card:#FFFFFF;--line:#E5E5EA;--ink:#1C1C1E;--ink2:#3C3C43;--ink3:#8E8E93;--accent:#0A60D0;--accent-ink:#0A4FA8;--accent-bg:#EAF2FE;--green:#1E7B34;--amber:#A05A00;--red:#C4281C;color-scheme:light}
 html,body{background:var(--page)}
 body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;color:var(--ink2);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased;padding-inline:16px;padding-block:28px 64px}
@@ -53,6 +54,7 @@ tr.tot td{color:var(--ink);font-weight:600}
 .neg{color:var(--red)}
 table.fx{table-layout:fixed;min-width:620px}table.fx th:first-child{width:17%}
 h2+p strong{color:var(--ink)}
+.ref{font-size:.74rem;margin-top:6px}.ref a{color:var(--accent);text-decoration:none}.ref a:hover{text-decoration:underline}
 .foot{font-size:.8rem;color:var(--ink3);text-align:center;padding:4px 0}
 @media (max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.card{padding:18px 16px}}
 @media print{html,body{background:#fff}body{padding:0;font-size:10.5pt}.card,.kpi,tr{break-inside:avoid}.card,.kpi{border-color:#ccc}:root{--ink2:#222;--ink3:#222}.ask,tr.rec td{background:#fff}.ask{border:1px solid #ccc}details>*{display:block}}
@@ -65,13 +67,13 @@ h2+p strong{color:var(--ink)}
 <section class="card">
   <div class="meta">Kính gửi HĐQT, Chủ tịch và BLĐ · Người lập: Ty Truong, Thường trực KSNB &amp; QTRR · 25/09/2026 · Số liệu đến 31/08, công nợ đến 21/09</div>
   <h1>Giáo dục Sông Hồng chưa tự đứng được về tài chính. Đề xuất: cấp vốn theo từng đợt gắn với mốc kết quả, đi kèm tái cấu trúc</h1>
-  <p>Sau 6 tháng, GDSH đã dựng xong nền móng nhưng số khách trả tiền còn rất thấp. Đến 31/08, tiền thu từ khách mới đạt 5% kế hoạch thu cả năm, trong khi tiền chi vận hành đã dùng 45% và đầu tư 44% ngân sách cả năm (Phụ lục A). Mảng khóa học có <strong>28 lượt đăng ký (25 học viên)</strong> trong T7–T8, so với kế hoạch cùng kỳ 372 lượt và cả năm 1.116 lượt. Kế hoạch 2026 được duyệt với mức lỗ 6,29 tỷ ngay cả khi đạt 100%, nên cấp thêm vốn mà không thay đổi cách vận hành sẽ chỉ kéo dài khoản lỗ. Theo ước tính, giữ nguyên cần khoảng <strong>9,0 tỷ</strong> trong 12 tháng tới; tái cấu trúc và cấp vốn theo mốc cần khoảng <strong>3,8 tỷ</strong>, chia 3 đợt.</p>
+  <p>Sau 6 tháng, GDSH đã dựng xong nền móng nhưng số khách trả tiền còn rất thấp. Đến 31/08, tiền thu từ khách mới đạt 5% kế hoạch thu cả năm, trong khi tiền chi vận hành đã dùng 45% và đầu tư 44% ngân sách cả năm (<a href="#phu-luc-a">Phụ lục A</a>). Mảng khóa học có <strong>28 lượt đăng ký (25 học viên)</strong> trong T7–T8, so với kế hoạch cùng kỳ 372 lượt và cả năm 1.116 lượt (<a href="#phu-luc-b">Phụ lục B</a>). Kế hoạch 2026 được duyệt với mức lỗ 6,29 tỷ ngay cả khi đạt 100%, nên cấp thêm vốn mà không thay đổi cách vận hành sẽ chỉ kéo dài khoản lỗ. Theo ước tính, giữ nguyên cần khoảng <strong>9,0 tỷ</strong> trong 12 tháng tới; tái cấu trúc và cấp vốn theo mốc cần khoảng <strong>3,8 tỷ</strong>, chia 3 đợt (<a href="#phuong-an">phần Phương án</a>).</p>
 
   <div class="kpis">
-    <div class="kpi"><div class="v">1,89 tỷ</div><div class="l">Tiền dùng được</div><div class="s">3,29 tỷ tiền − 1,39 tỷ công nợ đã cam kết</div></div>
-    <div class="kpi"><div class="v">~840 tr</div><div class="l">Tiền mặt chi ròng mỗi tháng</div><div class="s">giáo dục ~585 tr + hai khu vui chơi lỗ 253 tr (T8)</div></div>
-    <div class="kpi"><div class="v">~07/11</div><div class="l">Dự kiến hết tiền, còn ~6 tuần</div><div class="s">nếu giữ mức chi tháng 8 và trả hết công nợ</div></div>
-    <div class="kpi"><div class="v">28 / 1.116</div><div class="l">Lượt đăng ký khóa học / kế hoạch 2026</div><div class="s">tương đương 25 học viên (3 em học 2 khóa); kế hoạch riêng T7–T8 là 372 lượt</div></div>
+    <div class="kpi"><div class="v">1,89 tỷ</div><div class="l">Tiền dùng được</div><div class="s">3,29 tỷ tiền − 1,39 tỷ công nợ đã cam kết</div><div class="ref">Xem <a href="#phu-luc-c">Phụ lục C</a></div></div>
+    <div class="kpi"><div class="v">~840 tr</div><div class="l">Tiền mặt chi ròng mỗi tháng</div><div class="s">giáo dục ~585 tr + hai khu vui chơi lỗ 253 tr (T8)</div><div class="ref">Xem <a href="#phu-luc-a">Phụ lục A</a>, <a href="#phu-luc-e">Phụ lục E</a></div></div>
+    <div class="kpi"><div class="v">~07/11</div><div class="l">Dự kiến hết tiền, còn ~6 tuần</div><div class="s">nếu giữ mức chi tháng 8 và trả hết công nợ</div><div class="ref">Cách tính: <a href="#phu-luc-c">Phụ lục C</a></div></div>
+    <div class="kpi"><div class="v">28 / 1.116</div><div class="l">Lượt đăng ký khóa học / kế hoạch 2026</div><div class="s">tương đương 25 học viên (3 em học 2 khóa); kế hoạch riêng T7–T8 là 372 lượt</div><div class="ref">Xem <a href="#phu-luc-b">Phụ lục B</a></div></div>
   </div>
   <p class="note" style="margin-top:12px">Số liệu hai khu vui chơi tháng 7–8 lấy từ báo cáo nhanh của GDSH, chưa có sổ chi tiết. Đề nghị GDSH gửi số dư ngân hàng và sổ chi tiết hai khu vui chơi đến ngày họp để chốt lại mốc hết tiền.</p>
 
@@ -161,7 +163,7 @@ h2+p strong{color:var(--ink)}
   <p>Khu vui chơi Vinh xuất 5.300–7.200 hóa đơn mỗi tháng trong T4–T6, trong khi cả mảng khóa học mới có 25 học viên. Sau 30 ngày, tỷ lệ từ phiếu phát ra đến đăng ký sẽ cho biết kênh này đóng góp được bao nhiêu.</p>
 </section>
 
-<section class="card">
+<section class="card" id="phuong-an">
   <div class="eyebrow">Phương án</div>
   <h2>So sánh các hướng xử lý</h2>
   <p class="lead">Vốn cần thêm là ước tính cho 12 tháng tới (T9/2026–T8/2027), dựa trên số thực tế tháng 8; giả định ở phần mở rộng bên dưới.</p>
@@ -221,7 +223,7 @@ h2+p strong{color:var(--ink)}
 </section>
 
 <div class="apx">Phụ lục: số liệu chi tiết</div>
-<section class="card">
+<section class="card" id="phu-luc-a">
   <div class="eyebrow">Phụ lục A</div>
   <h2>Ngân sách so với thực hiện: dòng tiền và lãi/lỗ mảng giáo dục</h2>
   <p class="lead">Lũy kế T3–T8/2026, đơn vị triệu đồng. Dòng tiền so với ngân sách cả năm; lãi/lỗ so với cả ngân sách cùng kỳ và cả năm.</p>
@@ -238,6 +240,7 @@ h2+p strong{color:var(--ink)}
     </tbody>
   </table></div>
   <p class="note">Nguồn: sheet TH, phần C "Dòng tiền" của báo cáo thực hiện ngân sách T3–T8/2026. Báo cáo nhanh của GDSH dùng 9.103 tr là kế hoạch thu từ giảng dạy (chưa gồm 180 tr bán tài liệu); tính theo cả hai, tiền thu đều đạt khoảng 5%.</p>
+  <p>Riêng tháng 8: tiền thu 149,6 tr; tiền chi giá vốn 9,8 tr và chi vận hành 724,7 tr. Chi ròng mảng giáo dục là <strong>584,9 tr</strong>, là con số ~585 tr ở phần đầu (sheet TH, cột "Thực hiện tháng 08/2026").</p>
   <p style="margin-top:16px"><strong>Lãi/lỗ</strong> (theo sổ kế toán, doanh thu ghi nhận dần theo buổi học)</p>
   <div class="tw"><table class="mn">
     <thead><tr><th>Khoản mục</th><th class="r">Ngân sách cả năm 2026</th><th class="r">Ngân sách T3–T8</th><th class="r">Thực hiện T3–T8</th><th class="r">% so với cùng kỳ</th><th class="r">% so với cả năm</th></tr></thead>
@@ -253,7 +256,7 @@ h2+p strong{color:var(--ink)}
   <p>Lỗ thực tế T3–T8 (4.316,7 tr) thấp hơn mức lỗ ngân sách cùng kỳ (4.772,5 tr). Phần lỗ thấp hơn này đến từ việc chi vận hành mới dùng 72% ngân sách cùng kỳ, không đến từ bán hàng: doanh thu chỉ đạt 10,2%. Giá vốn đã dùng 45,7% ngân sách cùng kỳ trong khi doanh thu đạt 10,2%; riêng chương trình British Council chiếm 266,3 tr giá vốn.</p>
   <p class="note">Nguồn: Báo cáo thực hiện ngân sách T3–T8/2026 (sheet TH, bản 15/09). Doanh thu kế toán, chưa gồm VAT; khác với số tiền thu 471,5 tr vì học phí thu trước được ghi nhận dần theo buổi học. Số liệu mảng giáo dục, chưa gồm hai khu vui chơi.</p>
 </section>
-<section class="card">
+<section class="card" id="phu-luc-b">
   <div class="eyebrow">Phụ lục B</div>
   <h2>Học sinh: kế hoạch và thực hiện</h2>
   <p class="lead">Chỉ tiêu 2026 theo Tờ trình, và số đăng ký thực tế T6–T8/2026.</p>
@@ -299,7 +302,7 @@ h2+p strong{color:var(--ink)}
   <p>Cơ cấu tiền thu 471,5 tr: British Council 53,3%, trại hè 19,5%, trải nghiệm và lớp ngắn hạn 13,1%, Robotics 12,6%, học văn hóa 1,5%. Kênh đoàn trường đưa về 683 học sinh trong hai tháng hè (thêm 33 em chưa đủ hồ sơ ghi nhận), chủ yếu là trẻ mầm non với giá 45–70 nghìn/em. Hai đoàn có giá cao nhất là Tiểu học Bến Thủy (230 nghìn/em) và Galaxy English Center (280 nghìn/em).</p>
   <p class="note">Số đăng ký tính theo tháng nộp học phí vào tài khoản công ty (sổ ngân hàng). Tên học viên không đưa lên trang vì trang này công khai; tra theo mã trong sổ ngân hàng.</p>
 </section>
-<section class="card">
+<section class="card" id="phu-luc-c">
   <div class="eyebrow">Phụ lục C</div>
   <h2>Tiền, vốn và công nợ tại 31/08/2026</h2>
   <p class="lead">Dựng lại từ sổ ngân hàng và báo cáo ngân sách; GDSH chưa lập bảng cân đối kế toán hằng tháng.</p>
@@ -335,9 +338,10 @@ h2+p strong{color:var(--ink)}
     </tbody>
   </table></div>
   <p>Khoảng 85% số nợ này nằm ở ba khoản: British Council, khoản 300 tr chưa đủ chứng từ và đơn vị ghi cùng hợp đồng British Council. Đây cũng là ba khoản BLĐ có thể xem xét lại trước khi thanh toán.</p>
+  <p><strong>Cách tính mốc hết tiền ~07/11:</strong> tiền dùng được 1.893,1 tr ÷ chi ròng 838 tr/tháng (giáo dục 584,9 tr ở <a href="#phu-luc-a">Phụ lục A</a> + hai khu vui chơi lỗ 253 tr ở <a href="#phu-luc-e">Phụ lục E</a>) ≈ 2,26 tháng, tính từ 31/08/2026 ra khoảng 07/11/2026.</p>
   <p class="note">Hợp đồng British Council (số BCVN/TC/SHE/2026-07/1) có tổng giá trị 2,3 tỷ, trả 3 đợt: 25/07/2026 (đã trả 725 tr ngày 24/07), 01/10/2026 và 01/03/2027. File công nợ mới ghi 725 tr cho năm 2026; phần còn lại khoảng 850 tr của đợt 3 chưa nằm trong bảng trên. Chưa rõ 157,5 tr trả cho Cty TM &amp; PT Giáo dục Việt Nam có nằm trong 2,3 tỷ hay không.</p>
 </section>
-<section class="card">
+<section class="card" id="phu-luc-d">
   <div class="eyebrow">Phụ lục D</div>
   <h2>Kết quả kinh doanh mảng giáo dục theo tháng</h2>
   <p class="lead">Đơn vị triệu đồng.</p>
@@ -351,7 +355,7 @@ h2+p strong{color:var(--ink)}
   </table></div>
   <p>Lũy kế đến 31/08: doanh thu 199,2 tr, giá vốn 588,4 tr, chi phí vận hành 3.927,5 tr, lỗ 4.316,7 tr. Riêng chi phí nhân sự là 2.948 tr, bằng gần 15 lần doanh thu. Ngoài ra đã chi 2.474 tr cho tài sản và công cụ dụng cụ. Tính cả tiền thu vào, dòng tiền thuần đến 31/08 là âm 6.774 tr trên 10 tỷ vốn góp.</p>
 </section>
-<section class="card">
+<section class="card" id="phu-luc-e">
   <div class="eyebrow">Phụ lục E</div>
   <h2>Kết quả hai khu vui chơi</h2>
   <p class="lead">Khu Vinh, khu Long An và cộng hai khu, T2–T8/2026, đơn vị triệu đồng.</p>
