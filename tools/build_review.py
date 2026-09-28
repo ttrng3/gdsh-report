@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build review/index.html: the two versions of the GDSH report (Bản A, Bản B) as two tabs.
+"""Build review/index.html: the GDSH report sent to BLĐ (Bản B of the working doc).
 
-Sources are the HTML exports of the two tabs of the working doc, kept in review/src/.
+Source is the HTML export of the doc tab "Bản B · Gửi BLĐ", kept in review/src/B.html.
 Style is copied from brief/index.html so the two pages read as one site.
 Run: python3 tools/build_review.py
 """
@@ -83,8 +83,11 @@ def prep(src, prefix):
             out.append('<section class="card">' + p + "</section>")
     return "\n".join(out)
 
-A = prep((SRC / "A.html").read_text(encoding="utf-8"), "a")
-B = prep((SRC / "B.html").read_text(encoding="utf-8"), "b")
+raw = (SRC / "B.html").read_text(encoding="utf-8")
+title = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<h1[^>]*>(.*?)</h1>", raw, re.S).group(1)))
+lead = re.search(r"</h1>\s*(<p>.*?</p>)", raw, re.S).group(1)
+body = re.sub(r"^<h1[^>]*>.*?</h1>\s*<p>.*?</p>\s*", "", raw, flags=re.S)
+B = prep(body, "b")
 
 page = f"""<!doctype html>
 <html lang="vi">
@@ -99,39 +102,14 @@ page = f"""<!doctype html>
 <div class="wrap">
 <section class="card">
   <div class="meta">Kính gửi HĐQT, Chủ tịch và BLĐ · Người lập: Ty Truong, Thường trực KSNB &amp; QTRR · 26/09/2026 · Số liệu đến 31/08, công nợ đến 21/09</div>
-  <h1>Báo cáo GDSH gửi BLĐ</h1>
-  <p><strong>Bản B</strong> là bản gửi BLĐ: bức tranh tổng thể ở trang đầu, độ tin cậy của từng số liệu ghi bằng chữ, mỗi vấn đề có một giải pháp tương ứng. <strong>Bản A</strong> giữ lại để đối chiếu, theo đúng cấu trúc file Ngọc tổng hợp (mục lục I–IV + Phụ lục). Bản tóm lược: <a href="../brief/">GDSH Board Brief</a>.</p>
-  <div class="tabs" role="tablist" aria-label="Chọn bản">
-    <button role="tab" id="t-b" aria-controls="panel-b" aria-selected="true" data-tab="b">Bản B · Gửi BLĐ</button>
-    <button role="tab" id="t-a" aria-controls="panel-a" aria-selected="false" data-tab="a">Bản A · Đối chiếu (theo file của Ngọc)</button>
-  </div>
+  <h1>{html.escape(title)}</h1>
+  {lead}
 </section>
-<div class="panel" id="panel-b" role="tabpanel" aria-labelledby="t-b">
+<div class="panel">
 {B}
-</div>
-<div class="panel" id="panel-a" role="tabpanel" aria-labelledby="t-a" hidden>
-{A}
 </div>
 <div class="foot">Báo cáo nội bộ · noindex</div>
 </div>
-<script>
-(function(){{
-  var tabs=document.querySelectorAll('.tabs button'), panels={{a:document.getElementById('panel-a'),b:document.getElementById('panel-b')}};
-  function show(k,push){{
-    tabs.forEach(function(t){{t.setAttribute('aria-selected',t.dataset.tab===k?'true':'false')}});
-    panels.a.hidden=k!=='a'; panels.b.hidden=k!=='b';
-    try{{localStorage.setItem('gdsh-review-tab2',k)}}catch(e){{}}
-    if(push)history.replaceState(null,'','#ban-'+k);
-  }}
-  document.addEventListener('click',function(e){{
-    var el=e.target.closest('[data-tab]'); if(!el)return;
-    e.preventDefault(); show(el.dataset.tab,true); window.scrollTo(0,0);
-  }});
-  var h=location.hash.replace('#ban-',''), k=(h==='a'||h==='b')?h:null;
-  if(!k){{try{{k=localStorage.getItem('gdsh-review-tab2')}}catch(e){{}}}}
-  show(k==='a'?'a':'b',false);
-}})();
-</script>
 </body>
 </html>
 """
