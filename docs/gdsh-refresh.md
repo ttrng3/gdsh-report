@@ -79,18 +79,38 @@ repo secret; the routine path uses the GitHub MCP tools. Never echo or commit
 a token. `sa.json`, `budget.xlsx` and `fetch.out` are gitignored and deleted by
 the workflow's cleanup step, which runs `if: always()`.
 
-## One surface, on purpose
+## One address, one preview
 
-    schedule → cloud routine → source → GitHub → Pages
+    schedule → cloud routine → source → GitHub → Pages (the address) → artifact (Cowork preview)
 
-**GitHub Pages is the only published surface.** Ty ruled on 2026-09-23 that he
-wants control over what exists of his work, so there is no claude.ai artifact
-copy of this dashboard: the Pages URL above is the address, full stop.
+**https://ttrng3.github.io/gdsh-report/ is the only link.** A claude.ai artifact exists as the Cowork preview
+of this page, and the routine refreshes it as its last step, only after the
+repo is correct. Its URL is never written here, in a Drive doc, or in a run
+report: Ty ruled on 2026-09-24 and again on 2026-09-26 that content with a
+Pages address gets no second link. The routine prompt is the only place it
+lives. The preview must exist: "no artifact link" means the URL stays out of
+sight, never that the artifact goes.
 
-A mirror artifact existed for a few hours that day and was deleted. Do not
-recreate one, and do not add an artifact URL to this repo. `tools/build-fragment.py`
-is kept only because it is the one thing that can derive a standalone fragment
-of this page if it is ever needed; nothing in the refresh calls it.
+**This replaces the 2026-09-23 rule** that stood here ("there is no claude.ai
+artifact copy … do not recreate one"). That text is withdrawn, not a conflict
+to weigh: the routine prompt says this repo's files win, and on 2026-09-27 the
+TMDV routine read the same old text and skipped its mirror step.
+
+This page is fully rendered (it fetches nothing at runtime), so the preview
+IS the page: every time `index.html` changes, the routine runs
+`python3 tools/build-fragment.py` and publishes `build/artifact.html`.
+
+## The Artifact tool is attached: call it directly
+
+Don't conclude from a ToolSearch miss that a tool is missing. The Artifact tool is
+attached to this routine: it's in the routine's allowed tools. An attached tool
+never shows up in ToolSearch, which finds only deferred tools, so a ToolSearch
+miss is exactly what an attached tool looks like. It is not evidence that the
+tool is absent. Call it directly for the mirror step. Only an error returned by
+the tool itself means it is unavailable, and then the mirror step reports that
+error and stops, as the prompt says. (2026-09-27: the TMDV routine searched,
+missed, reported "no Artifact tool" and skipped its mirror. The routines whose
+prompts say "call it directly" keep their previews in sync.)
 
 ## Look: Apple layer, light only (2026-09-24)
 
