@@ -1,0 +1,20 @@
+# Files GitHub Pages publishes. Nothing else in this repo is served.
+# Line types:  path or glob = published (a * never crosses a /; a glob must
+# match a file) · !path = known, deliberately not published · @prefix/ = a
+# watched area: every file a writer changes under it must match a line
+# above, or the Pages run fails "UNCOVERED".
+# The workflow deploys only once Pages is set to GitHub Actions; until then
+# every run is a dry run that stages and checks but publishes nothing.
+# Writers: the weekly routine and publish.yml (monthly, 17th) both write
+# index.html, history.json, data/index.json and data/.last-check.
+# The pages are fully rendered and fetch nothing at runtime.
+index.html
+brief/index.html
+review/index.html
+!history.json
+!data/index.json
+!data/.last-check
+@data/
+@history.json
+# Not published: judgment/judgment.html (generator input with {placeholders})
+# and review/src/B.html (the doc export /review/ is built from).
