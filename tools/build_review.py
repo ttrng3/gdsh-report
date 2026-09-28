@@ -32,35 +32,43 @@ figure{margin:8px 0 12px}figcaption{font-size:.78rem;color:var(--ink3);margin-to
 """
 
 def chart_svg():
-    rows = [("T9/26",2.20,2.20,2.20),("T10",0.46,0.42,1.42),("T11",-0.71,-0.56,0.44),("T12",-1.57,-0.36,0.64),
-            ("T1/27",-2.42,-0.76,0.24),("T2",-3.26,-0.94,1.56),("T3",-4.95,-2.11,0.39),("T4",-5.78,-2.44,0.06),
-            ("T5",-6.60,-2.60,1.20),("T6",-7.42,-2.79,1.01),("T7",-8.22,-2.98,0.82),("T8/27",-9.02,-3.27,0.53)]
-    lo, hi, y0 = -10, 4, 80
-    x = lambda i: 72 + i * 548 / (len(rows) - 1)
+    # rows: month, A, B without funding, B with 3 tranches, tranche received that month
+    rows = [("T9/26",2.20,2.20,2.20,0),("T10",0.46,0.42,1.42,1.0),("T11",-0.71,-0.56,0.44,0),("T12",-1.57,-0.36,0.64,0),
+            ("T1/27",-2.42,-0.76,0.24,0),("T2",-3.26,-0.94,1.56,1.5),("T3",-4.95,-2.11,0.39,0),("T4",-5.78,-2.44,0.06,0),
+            ("T5",-6.60,-2.60,1.20,1.3),("T6",-7.42,-2.79,1.01,0),("T7",-8.22,-2.98,0.82,0),("T8/27",-9.02,-3.27,0.53,0)]
+    lo, hi, y0, right = -10, 4, 80, 560
+    x = lambda i: 72 + i * (right - 72) / (len(rows) - 1)
     y = lambda v: y0 + (hi - v) / (hi - lo) * 224
-    f = lambda v: f"{v:.2f}".replace(".", ",").replace("-", "−")
-    series = [(1, "A. Giữ nguyên", "var(--red)"), (2, "B. Không cấp vốn", "var(--amber)"), (3, "B. Có cấp vốn", "var(--green)")]
-    o = ['<svg viewBox="0 0 760 380" role="img" aria-label="Tái cấu trúc kèm 3 đợt vốn giữ tiền trên 0 suốt 12 tháng" font-size="12" font-family="inherit">',
-         '<text x="24" y="30" font-size="16" font-weight="600" fill="var(--ink)">Tái cấu trúc kèm 3 đợt vốn giữ tiền trên 0 suốt 12 tháng</text>',
-         '<text x="24" y="52" fill="var(--ink3)">Tiền cuối tháng (tỷ đồng), ước tính mô hình</text>']
+    f = lambda v: f"{abs(v):.2f}".replace(".", ",")
+    tell = lambda v: f"thiếu {f(v)} tỷ" if v < 0 else f"còn {f(v)} tỷ"
+    series = [(1, "A · Giữ nguyên", "var(--red)"), (2, "B · Chưa cấp vốn", "var(--amber)"), (3, "B · Có 3 đợt vốn", "var(--green)")]
+    o = ['<svg viewBox="0 0 760 380" role="img" aria-label="Tái cấu trúc cùng 3 đợt vốn (3,8 tỷ) giữ tiền trên 0 suốt 12 tháng" font-size="12" font-family="inherit">',
+         '<text x="24" y="28" font-size="16" font-weight="600" fill="var(--ink)">Tái cấu trúc cùng 3 đợt vốn (3,8 tỷ) giữ tiền trên 0 suốt 12 tháng</text>',
+         '<text x="24" y="48" fill="var(--ink3)">Tiền còn trong tài khoản cuối tháng (tỷ đồng) · số âm là phần tiền thiếu, không phải lỗ</text>']
     for t in range(-10, 5, 2):
         if t != 0:
-            o.append(f'<line x1="72" x2="620" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="var(--line)"/>')
+            o.append(f'<line x1="72" x2="{right}" y1="{y(t):.1f}" y2="{y(t):.1f}" stroke="var(--line)"/>')
         o.append(f'<text x="62" y="{y(t)+4:.1f}" text-anchor="end" fill="var(--ink3)">{str(t).replace("-","−")}</text>')
-    o.append(f'<line x1="72" x2="620" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="var(--ink3)" stroke-dasharray="4 4"/>')
+    for i, label in ((1, "Trả British Council đợt 2"), (6, "Trả British Council đợt 3")):
+        o.append(f'<line x1="{x(i):.1f}" x2="{x(i):.1f}" y1="64" y2="304" stroke="var(--ink3)" stroke-dasharray="2 3"/>')
+        o.append(f'<text x="{x(i)+4:.1f}" y="70" font-size="11" fill="var(--ink3)">{label}</text>')
+    o.append(f'<line x1="72" x2="{right}" y1="{y(0):.1f}" y2="{y(0):.1f}" stroke="var(--ink3)" stroke-dasharray="5 4"/>')
     o.append(f'<text x="{x(9):.1f}" y="{y(0)+16:.1f}" text-anchor="middle" fill="var(--ink3)">Mức 0: hết tiền</text>')
     for i, r in enumerate(rows):
         o.append(f'<text x="{x(i):.1f}" y="326" text-anchor="middle" fill="var(--ink3)">{r[0]}</text>')
-    o.append('<text x="346" y="352" text-anchor="middle" fill="var(--ink3)">Tháng, T9/2026–T8/2027</text>')
+    o.append(f'<text x="{(72+right)/2:.0f}" y="352" text-anchor="middle" fill="var(--ink3)">Tháng, T9/2026–T8/2027</text>')
     end = x(len(rows) - 1) + 12
     for k, name, col in series:
         pts = " ".join(f"{x(i):.1f},{y(r[k]):.1f}" for i, r in enumerate(rows))
         o.append(f'<polyline fill="none" stroke="{col}" stroke-width="2.5" stroke-linejoin="round" points="{pts}"/>')
         for i, r in enumerate(rows):
-            o.append(f'<circle cx="{x(i):.1f}" cy="{y(r[k]):.1f}" r="3.5" fill="{col}"><title>{name}, {r[0]}: {f(r[k])} tỷ</title></circle>')
+            o.append(f'<circle cx="{x(i):.1f}" cy="{y(r[k]):.1f}" r="3.5" fill="{col}"><title>{name}, {r[0]}: {tell(r[k])}</title></circle>')
         last = rows[-1][k]
         o.append(f'<text x="{end:.1f}" y="{y(last)-2:.1f}" font-weight="600" fill="var(--ink)">{name}</text>')
-        o.append(f'<text x="{end:.1f}" y="{y(last)+14:.1f}" fill="var(--ink3)">{f(last)}</text>')
+        o.append(f'<text x="{end:.1f}" y="{y(last)+14:.1f}" fill="var(--ink3)">{tell(last)}</text>')
+    for i, r in enumerate(rows):
+        if r[4]:
+            o.append(f'<text x="{x(i):.1f}" y="{y(r[3])-10:.1f}" text-anchor="middle" font-weight="600" fill="var(--green)">+{f(r[4])} tỷ</text>')
     o.append("</svg>")
     return "".join(o)
 
