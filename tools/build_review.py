@@ -92,25 +92,25 @@ page = f"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>GDSH Report Versions</title>
+<title>GDSH BLĐ Report</title>
 <style>{css}{EXTRA_CSS}</style>
 </head>
 <body>
 <div class="wrap">
 <section class="card">
   <div class="meta">Kính gửi HĐQT, Chủ tịch và BLĐ · Người lập: Ty Truong, Thường trực KSNB &amp; QTRR · 26/09/2026 · Số liệu đến 31/08, công nợ đến 21/09</div>
-  <h1>Báo cáo GDSH: hai bản để so sánh</h1>
-  <p>Cùng một bộ số liệu. <strong>Bản A</strong> theo đúng cấu trúc và nội dung file Ngọc tổng hợp lại (mục lục I–IV + Phụ lục). <strong>Bản B</strong> trình bày lại theo góp ý: bức tranh tổng thể ở trang đầu, mỗi con số ghi độ tin cậy, mỗi vấn đề có đúng một giải pháp. Bản tóm lược cho BLĐ: <a href="../brief/">GDSH Board Brief</a>.</p>
+  <h1>Báo cáo GDSH gửi BLĐ</h1>
+  <p><strong>Bản B</strong> là bản gửi BLĐ: bức tranh tổng thể ở trang đầu, độ tin cậy của từng số liệu ghi bằng chữ, mỗi vấn đề có một giải pháp tương ứng. <strong>Bản A</strong> giữ lại để đối chiếu, theo đúng cấu trúc file Ngọc tổng hợp (mục lục I–IV + Phụ lục). Bản tóm lược: <a href="../brief/">GDSH Board Brief</a>.</p>
   <div class="tabs" role="tablist" aria-label="Chọn bản">
-    <button role="tab" id="t-a" aria-controls="panel-a" aria-selected="true" data-tab="a">Bản A · Theo file của Ngọc</button>
-    <button role="tab" id="t-b" aria-controls="panel-b" aria-selected="false" data-tab="b">Bản B · Theo góp ý + mục lục</button>
+    <button role="tab" id="t-b" aria-controls="panel-b" aria-selected="true" data-tab="b">Bản B · Gửi BLĐ</button>
+    <button role="tab" id="t-a" aria-controls="panel-a" aria-selected="false" data-tab="a">Bản A · Đối chiếu (theo file của Ngọc)</button>
   </div>
 </section>
-<div class="panel" id="panel-a" role="tabpanel" aria-labelledby="t-a">
-{A}
-</div>
-<div class="panel" id="panel-b" role="tabpanel" aria-labelledby="t-b" hidden>
+<div class="panel" id="panel-b" role="tabpanel" aria-labelledby="t-b">
 {B}
+</div>
+<div class="panel" id="panel-a" role="tabpanel" aria-labelledby="t-a" hidden>
+{A}
 </div>
 <div class="foot">Báo cáo nội bộ · noindex</div>
 </div>
@@ -120,7 +120,7 @@ page = f"""<!doctype html>
   function show(k,push){{
     tabs.forEach(function(t){{t.setAttribute('aria-selected',t.dataset.tab===k?'true':'false')}});
     panels.a.hidden=k!=='a'; panels.b.hidden=k!=='b';
-    try{{localStorage.setItem('gdsh-review-tab',k)}}catch(e){{}}
+    try{{localStorage.setItem('gdsh-review-tab2',k)}}catch(e){{}}
     if(push)history.replaceState(null,'','#ban-'+k);
   }}
   document.addEventListener('click',function(e){{
@@ -128,8 +128,8 @@ page = f"""<!doctype html>
     e.preventDefault(); show(el.dataset.tab,true); window.scrollTo(0,0);
   }});
   var h=location.hash.replace('#ban-',''), k=(h==='a'||h==='b')?h:null;
-  if(!k){{try{{k=localStorage.getItem('gdsh-review-tab')}}catch(e){{}}}}
-  show(k==='b'?'b':'a',false);
+  if(!k){{try{{k=localStorage.getItem('gdsh-review-tab2')}}catch(e){{}}}}
+  show(k==='a'?'a':'b',false);
 }})();
 </script>
 </body>
