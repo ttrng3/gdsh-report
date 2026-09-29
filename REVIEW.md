@@ -37,12 +37,12 @@ When unsure between two levels, pick the higher one and say why.
 - [ ] **Verify before you assert:** every number in a doc or page has a source named beside it or in its section.
 
 ## Repo-specific rules
-Rules specific to gdsh-report. **Every standing ruling in the README and in `docs/gdsh-refresh.md` (the runbook, which outranks the routine prompt) applies as well; a PR that breaks one is High.** The lines below are the ones most often at risk.
+Rules specific to gdsh-report. **Every standing ruling in the README and in `docs/gdsh-refresh.md` (the runbook, which outranks the routine prompt) applies as well; a PR that breaks one is at least High, and Critical where a line below says so.** The lines below are the ones most often at risk.
 
 - **`index.html` is generated.** `gdsh_extract.py` → `gdsh_render.py` → `build_auto.py` produce it (runbook, "The chain"). A hand edit to `index.html` is High; the change belongs in the generator or in `judgment/judgment.html`.
 - **`brief/` and `review/` are hand-maintained** and are not touched by the routine or `publish.yml` (README). A routine or workflow change that writes into them is High. `review/index.html` is built by `tools/build_review.py` from `review/src/B.html`.
 - **The judgment layer is hand-edited and read-only to the build.** `build_auto.py` reads `judgment/judgment.html` and never writes it (runbook, "The judgment layer"). A build change that writes it is High.
-- **Figures in judgment prose come through `{placeholders}`**, so the verdict can't disagree with the chart beside it. A new literal figure in the judgment prose that a placeholder could supply is High. An unknown placeholder must keep stopping the build.
+- **Figures in judgment prose come through `{placeholders}`**, so the verdict can't disagree with the chart beside it. A new literal figure in the judgment prose that a placeholder could supply is High. An unknown placeholder or a missing block must keep stopping the build (runbook, "The judgment layer").
 - **The generator reproduces the committed page byte for byte** (checked 2026-09-24, runbook "The judgment layer"). A generator change that alters output beyond the numbers must say so in the PR; unannounced, it is High.
 - **Chart colours are tokens.** A new chart colour goes into `SVG_TOKENS` (or `CAT`) in `gdsh_render.py` (runbook, "Look"). A raw hex that bypasses them is High.
 - **Light only, ruled 2026-09-24 by Ty.** No dark theme, no webfont (runbook, "Look").
