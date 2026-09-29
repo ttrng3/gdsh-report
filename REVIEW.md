@@ -52,4 +52,4 @@ Rules specific to gdsh-report. **Every standing ruling in the README and in `doc
 - **Never fetch the live site from a routine** (runbook, "Verifying a run"). Such an instruction is High.
 - **One address, one preview.** `https://ttrng3.github.io/gdsh-report/` is the only link. A Cowork preview URL or artifact id anywhere in the repo is **Critical** (the repo is public).
 - **Don't widen what is published.** A new path in `.pages-allow`, or a new kind of data in `data/`, is High and needs Ty. (Carried from Omni-TMDV's REVIEW.md; not stated in this repo's own files.)
-- **Entity separation.** The template rule in Pass 3 applies. This repo's files don't say which entity owns it, so until Ty rules, data from another project or entity is at least High and flagged for Ty.
+- **Entity separation.** This is an OMNI repo (Ty ruled 2026-09-29). Any ECOPM data (a person's or a client's name, a number, or a file from the ECOPM side) is **Critical**. The entity label itself isn't.
