@@ -48,8 +48,8 @@ Rules specific to gdsh-report. **Every standing ruling in the README and in `doc
 - **Light only, ruled 2026-09-24 by Ty.** No dark theme, no webfont (runbook, "Look").
 - **Credentials.** `sa.json`, `budget.xlsx` and `fetch.out` are gitignored and deleted by the workflow's `if: always()` cleanup (runbook, "Credentials"). Committing any of them, or a token, is **Critical**. Only Ty sets the Actions secrets.
 - **`data/index.json` is a clock, not a data store**; the page does not read it (runbook, "data/index.json"). Making the page depend on it is High.
-- **The heartbeat stays.** `data/.last-check` is written on every run before anything else. A diff that stops writing it is High.
+- **The heartbeat stays.** `data/.last-check` is written on every workflow run, before anything else (runbook, "The heartbeat"). A diff that stops writing it is High.
 - **Never fetch the live site from a routine** (runbook, "Verifying a run"). Such an instruction is High.
 - **One address, one preview.** `https://ttrng3.github.io/gdsh-report/` is the only link. A Cowork preview URL or artifact id anywhere in the repo is **Critical** (the repo is public).
-- **Don't widen what is published.** A new path in `.pages-allow`, or a new kind of data in `data/`, is High and needs Ty.
-- **Entity separation.** This repo is GDSH (Giáo dục Sông Hồng). Data from another project or entity is **Critical**.
+- **Don't widen what is published.** A new path in `.pages-allow`, or a new kind of data in `data/`, is High and needs Ty. (Carried from Omni-TMDV's REVIEW.md; not stated in this repo's own files.)
+- **Entity separation.** The template rule in Pass 3 applies. This repo's files don't say which entity owns it, so until Ty rules, data from another project or entity is at least High and flagged for Ty.
