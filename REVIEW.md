@@ -39,7 +39,7 @@ When unsure between two levels, pick the higher one and say why.
 ## Repo-specific rules
 Rules specific to gdsh-report. **Every standing ruling in the README and in `docs/gdsh-refresh.md` (the runbook, which outranks the routine prompt) applies as well; a PR that breaks one is at least High, and Critical where a line below says so.** The lines below are the ones most often at risk.
 
-- **`index.html` is generated.** `gdsh_extract.py` → `gdsh_render.py` → `build_auto.py` produce it (runbook, "The chain"). A hand edit to `index.html` is High; the change belongs in the generator or in `judgment/judgment.html`.
+- **`index.html` is generated.** `gdsh_extract.py` → `gdsh_render.py` → `build_auto.py` produce it (runbook, "The chain"). A hand edit to the root `index.html` is High (the hand-maintained `brief/index.html` is not covered by this rule); the change belongs in the generator or in `judgment/judgment.html`.
 - **`brief/` and `review/` are hand-maintained** and are not touched by the routine or `publish.yml` (README). A routine or workflow change that writes into them is High. `review/index.html` is built by `tools/build_review.py` from `review/src/B.html`.
 - **The judgment layer is hand-edited and read-only to the build.** `build_auto.py` reads `judgment/judgment.html` and never writes it (runbook, "The judgment layer"). A build change that writes it is High.
 - **Figures in judgment prose come through `{placeholders}`**, so the verdict can't disagree with the chart beside it. A new literal figure in the judgment prose that a placeholder could supply is High. An unknown placeholder or a missing block must keep stopping the build (runbook, "The judgment layer").
