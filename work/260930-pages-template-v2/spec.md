@@ -5,7 +5,10 @@ Status: approved by Ty 30/09. Full spec: claude-config `work/260929-pages-templa
 ## Change
 `.github/workflows/pages.yml` becomes the template at 3f62fe2 minus the optional placeholder comment. gdsh-report keeps its filled-in `workflow_run` trigger (GDSH monthly publish) in place of the placeholder comment. `.pages-allow` changes only its header comment, to describe the new rules.
 
-## Behaviour changes (pre-checked on this repo 30/09: 0 uncovered files, 0 symlinks, no `./`, `//` or space in any line)
+## Behaviour changes
+
+Pre-check, 30/09, on this repo's main before the branch: `git ls-files -s -z` (every tracked file, with its mode) run through the template's own coverage rules (watched prefixes, `*` never matching a leading dot, mode 120000 = symlink) against `.pages-allow`, plus a scan of every `.pages-allow` line for `./`, `//` or a space. Result: 0 uncovered files, 0 symlinks, 0 such lines.
+
 - Coverage reads every tracked file in a watched area, not the last diff; `fetch-depth: 50` is dropped.
 - A `*` never matches a leading dot; a line containing `*`, `?` or `[` is a glob; a glob line is never split on spaces.
 - Trimming uses parameter expansion (quotes taken literally).
@@ -13,4 +16,4 @@ Status: approved by Ty 30/09. Full spec: claude-config `work/260929-pages-templa
 - Permissions: workflow `contents: read`; build `contents: read` + `pages: read`; deploy `pages: write` + `id-token: write`. Proven live on Omni-TMDV 30/09.
 
 ## Pass condition (after merge)
-The first run shows `mode: live` with configure-pages, upload and deploy green, and every served file byte-identical to the pre-merge baseline posted on the PR. A failure reverts this PR.
+The first run shows `mode: live` with configure-pages, upload and deploy green, and every served file byte-identical to the pre-merge baseline posted on the PR (path + sha256 of each served file, fetched from the live site just before the PR was opened). If a routine commit lands between the baseline and that run, a changed file is compared with its copy at the deployed commit instead. A failure reverts this PR.
