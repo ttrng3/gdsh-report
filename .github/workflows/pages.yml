@@ -17,8 +17,10 @@
 #   - a missing path, or a glob that matches nothing
 #   - a path that escapes the repo, or a symlink anywhere in a listed path
 #   - a backslash on any line
-#   - a [ ] form other than a simple set ([abc], [!x], [^x]; no set inside a set)
+#   - a [ ] form other than a simple set ([abc], [!x], [^x]; no set inside a
+#     set, no / inside a set)
 #   - any wildcard on an @ line (a watched area is a plain path)
+#   - an allowlist that lists nothing to publish
 # In a simple set, [^x] and [!x] both mean "not x" in both steps.
 name: Pages (allowlist)
 
@@ -88,9 +90,10 @@ jobs:
             [ -z "$path" ] && continue
             case "$path" in *\\*) echo "::error::refusing a backslash in .pages-allow (bash and the coverage check read escapes differently; use a ? or * glob instead): $path"; exit 1;; esac
             # one pass, never repeated, so removing a set can't join its neighbours into a new one;
-            # a leading ! or ^ is always negation and needs at least one member
-            rest="$(printf '%s' "$path" | sed -E 's/\[([!^][^][]+|[^][!^][^][]*)\]//g')"
-            case "$rest" in *[][]*) echo "::error::refusing a [ ] form other than a simple set like [abc], [!x] or [^x] (the coverage check reads other forms differently): $path"; exit 1;; esac
+            # a leading ! or ^ is always negation and needs at least one member; a / is never a member;
+            # # is the delimiter because comments are already stripped, so no # reaches this line
+            rest="$(printf '%s' "$path" | sed -E 's#\[([!^][^][/]+|[^][!^/][^][/]*)\]##g')"
+            case "$rest" in *[][]*) echo "::error::refusing a [ ] form other than a simple set like [abc], [!x] or [^x] (no set inside a set, no / inside a set; the coverage check reads other forms differently): $path"; exit 1;; esac
             case "$path" in @*[\*\?\[]*) echo "::error::refusing a wildcard on an @ line (a watched area is a plain path, not a glob): $path"; exit 1;; esac
             case "$path" in !*|@*) continue;; esac
             case "$path" in /*|*..*) echo "::error::refusing path outside the repo: $path"; exit 1;; esac
