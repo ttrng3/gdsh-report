@@ -5,8 +5,8 @@
 # watched area: every tracked file under it must match a line above, or the
 # Pages run fails "UNCOVERED". A symlink anywhere in a listed path, or a
 # tracked symlink in a watched area, is refused.
-# Pages runs from GitHub Actions (switched 2026-09-29), so every green run
-# deploys. A run is a dry run only if that setting is changed back.
+# Pages runs from GitHub Actions (switched 2026-09-29): a run that stages
+# deploys the allowlisted files, even when coverage then turns it red.
 # Writers: the weekly routine and publish.yml (monthly, 17th) both write
 # index.html, history.json, data/index.json and data/.last-check.
 # The pages are fully rendered and fetch nothing at runtime.

@@ -1,5 +1,5 @@
 # Intent (accepted)
 
-Status: accepted by Ty 30/09 (he asked for the week's follow-up list to be done; these came out of the CLAUDE.md drafting).
+Status: awaiting Ty's approval (with the spec).
 
-Stale or leaky text in docs only.
+Found while drafting this repo's CLAUDE.md: the allowlist's stale dry-run note, and Drive file ids written into the public heartbeat.
