@@ -5,7 +5,7 @@ OMNI's GDSH budget dashboard, plus the hand-maintained board brief and BLĐ repo
 **If you are the scheduled routine:** follow the files your prompt names, `docs/gdsh-refresh.md` and `README.md`. They outrank this file. This file adds no step to a run.
 
 ## Commands
-- Build the Cowork preview page, only when `index.html` changed: `python3 tools/build-fragment.py` (writes `build/artifact.html`; never send `index.html` itself to the Cowork preview — Pages does serve it)
+- Build the Cowork preview page: `python3 tools/build-fragment.py` (writes `build/artifact.html`). When the routine refreshes the preview is set by its runbook, not here. Never send `index.html` itself to the preview; Pages does serve it.
 - Rebuild the BLĐ report after `review/src/B.html` changes: `python3 tools/build_review.py` (writes `review/index.html`)
 - Freshness check, as the daily Action runs it: `python3 .github/scripts/freshness.py`
 
@@ -18,7 +18,7 @@ OMNI's GDSH budget dashboard, plus the hand-maintained board brief and BLĐ repo
 - `README.md` and `SETUP_AUTONOMY.md` explain the pipeline; `REVIEW.md` holds the reviewer's rules.
 
 ## Rules
-- Changes reach `main` through a PR and Ty's ship. The routine's data writes are the only direct writes.
+- Changes reach `main` through a PR and Ty's ship. The only direct writes are the ones a routine's prompt and runbook allow, plus `publish.yml`'s own commits.
 - The runbook and README win over this file and any memory note.
 - Light only (Ty, 2026-09-24): no dark theme, no webfont. A new chart colour goes into `SVG_TOKENS` (or `CAT`) in `gdsh_render.py`.
 - Never commit `sa.json`, `budget.xlsx`, `fetch.out` or a token. Only Ty sets the Actions secrets.
