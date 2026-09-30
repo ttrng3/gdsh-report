@@ -12,6 +12,7 @@ Pre-check, 30/09, on this repo's main before the branch: `git ls-files -s -z` (e
 - Coverage reads every tracked file in a watched area, not the last diff; `fetch-depth: 50` is dropped.
 - A `*` never matches a leading dot; a line containing `*`, `?` or `[` is a glob; a glob line is never split on spaces.
 - Trimming uses parameter expansion (quotes taken literally).
+- Watch entries are paths: `@data/` or `@data` watches `data` and everything under `data/`, never `database/`; `@file` watches exactly that file; a bare `@` watches the whole tree. This repo's watch lines cover the same files as before.
 - A symlink anywhere in a listed path, a path resolving outside the repo, or a path not written plainly stops the deploy; a tracked symlink in a watched area turns the run red.
 - Permissions: workflow `contents: read`; build `contents: read` + `pages: read`; deploy `pages: write` + `id-token: write`. Proven live on Omni-TMDV 30/09.
 
