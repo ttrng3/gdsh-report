@@ -1,17 +1,20 @@
-# Publishes only what .pages-allow lists, and checks that everything the
-# routine writes is accounted for.
+# Publishes only what .pages-allow lists, and checks that every tracked file
+# in a watched area is accounted for.
 #
 # .pages-allow line types:
 #   path or glob     published (a glob never crosses a / and must match a file)
 #   !path or !glob   known, deliberately NOT published
-#   @prefix/         a watched area: every changed file under it must match a
+#   @prefix/         a watched area: every tracked file under it must match a
 #                    published or ! line, or the run fails "UNCOVERED"
+#                    (the whole tree is checked every run, not just the diff)
+# A * never matches a leading dot, on published and ! lines alike (bash staging
+# runs with dotglob off): list a dotfile explicitly, e.g. !data/.last-check.
 #
 # Dry run: unless the Pages setting reads build_type == workflow, nothing is
 # deployed. A failed read never deploys either, and it turns the run RED
 # (couldn't tell), while a read of 'legacy' is a green dry run.
-# Fails closed: a missing path, an empty glob or an escaping path stops the
-# deploy, and the live site stays as it was.
+# Fails closed: a missing path, an empty glob, an escaping path or a symlink
+# anywhere in a listed path stops the deploy, and the live site stays as it was.
 name: Pages (allowlist)
 
 on:
@@ -26,8 +29,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -37,6 +38,9 @@ jobs:
   build:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
     outputs:
       mode: ${{ steps.mode.outputs.mode }}
       uncovered: ${{ steps.coverage.outputs.uncovered }}
@@ -45,7 +49,6 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: main
-          fetch-depth: 50
 
       - name: Mode (live only when Pages is set to GitHub Actions)
         id: mode
@@ -75,18 +78,23 @@ jobs:
           rm -rf _site && mkdir _site
           n=0
           while IFS= read -r line || [ -n "$line" ]; do
-            path="${line%%#*}"; path="$(echo "$path" | xargs)"
+            path="${line%%#*}"
+            path="${path#"${path%%[![:space:]]*}"}"; path="${path%"${path##*[![:space:]]}"}"
             [ -z "$path" ] && continue
             case "$path" in !*|@*) continue;; esac
             case "$path" in /*|*..*) echo "::error::refusing path outside the repo: $path"; exit 1;; esac
-            if [[ "$path" == *"*"* ]]; then
-              matches=( $path )
+            if [[ "$path" == *[\*\?\[]* ]]; then
+              IFS= ; matches=( $path ); unset IFS   # glob, but never split a line on spaces
               [ "${#matches[@]}" -gt 0 ] || { echo "::error::glob in .pages-allow matches nothing: $path"; exit 1; }
             else
               matches=( "$path" )
             fi
             for f in "${matches[@]}"; do
+              [ -L "$f" ] && { echo "::error::refusing a symlink in .pages-allow: $f"; exit 1; }
               [ -f "$f" ] || { echo "::error::listed in .pages-allow but missing: $f"; exit 1; }
+              real="$(realpath -e -- "$f")"; root="$(pwd -P)"
+              case "$real" in "$root"/*) ;; *) echo "::error::refusing a path that resolves outside the repo (a symlinked directory?): $f"; exit 1;; esac
+              [ "$real" = "$root/$f" ] || { echo "::error::refusing a path that goes through a symlink (or is not written plainly): $f"; exit 1; }
               cp --parents "$f" _site/
               n=$((n+1))
             done
@@ -94,44 +102,43 @@ jobs:
           [ "$n" -gt 0 ] || { echo "::error::.pages-allow lists nothing"; exit 1; }
           echo "Staged $n file(s):"; find _site -type f | sort
 
-      - name: Coverage (every changed file in a watched area is listed)
+      - name: Coverage (every tracked file in a watched area is listed)
         id: coverage
         shell: bash
-        env:
-          EVENT: ${{ github.event_name }}
-          BEFORE: ${{ github.event.before }}
-          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
-          zero=0000000000000000000000000000000000000000
-          if [ "$EVENT" = "push" ] && [ -n "$BEFORE" ] && [ "$BEFORE" != "$zero" ] && git cat-file -e "$BEFORE" 2>/dev/null; then
-            base="$BEFORE"
-          elif [ "$EVENT" = "workflow_run" ] && [ -n "$RUN_SHA" ] && git cat-file -e "$RUN_SHA" 2>/dev/null; then
-            base="$RUN_SHA"
-          else
-            base="HEAD~1"
-          fi
-          git diff --name-only "$base" HEAD > /tmp/changed.txt || true
-          echo "Changed since $base:"; sed 's/^/  /' /tmp/changed.txt
+          git ls-files -s -z > /tmp/tracked.bin
           python3 - <<'PY'
-          import fnmatch, sys
+          import fnmatch
           pub, known, watch = [], [], []
           for raw in open(".pages-allow"):
               s = raw.split("#", 1)[0].strip()
               if not s: continue
-              if s.startswith("@"): watch.append(s[1:])
+              if s.startswith("@"): watch.append(s[1:].rstrip("/"))   # a file, or a directory and everything under it
               elif s.startswith("!"): known.append(s[1:])
               else: pub.append(s)
-          def match(f, pat):  # * never crosses a /
+          def seg(name, pat):  # bash staging runs with dotglob off: * never matches a leading dot
+              if name.startswith(".") and not pat.startswith("."): return False
+              return fnmatch.fnmatchcase(name, pat)
+          def match(f, pat):   # * never crosses a /
               a, b = f.split("/"), pat.split("/")
-              return len(a) == len(b) and all(fnmatch.fnmatchcase(x, y) for x, y in zip(a, b))
-          changed = [l.strip() for l in open("/tmp/changed.txt") if l.strip()]
-          bad = [f for f in changed
-                 if any(f.startswith(w) for w in watch)
-                 and not any(match(f, p) for p in pub + known)]
-          open("/tmp/uncovered.txt", "w").write("\n".join(bad))
-          for f in bad: print(f"::error::UNCOVERED: {f} (in a watched area, but on no .pages-allow line)")
-          print(f"Coverage: {len(changed)} changed, {len(bad)} uncovered, watched: {watch or 'none'}")
+              return len(a) == len(b) and all(seg(x, y) for x, y in zip(a, b))
+          tracked = []
+          for rec in open("/tmp/tracked.bin", "rb").read().split(b"\0"):
+              if not rec: continue
+              meta, path = rec.decode("utf-8", "surrogateescape").split("\t", 1)   # -z: no C-quoting
+              tracked.append((path, meta.split()[0] == "120000"))   # 120000 = symlink
+          def watched(f):  # "@data" watches data and data/..., never database/...; a bare "@" watches everything
+              return any(w == "" or f == w or f.startswith(w + "/") for w in watch)
+          bad = []
+          for f, is_link in tracked:
+              if not watched(f): continue
+              if is_link: bad.append((f, "a symlink: never allowed in a watched area, even on a ! line"))
+              elif not any(match(f, p) for p in pub + known): bad.append((f, "in a watched area, but on no .pages-allow line"))
+          open("/tmp/uncovered.txt", "w").write("\n".join(f for f, _ in bad))
+          for f, why in bad: print(f"::error::UNCOVERED: {f} ({why})")
+          n = sum(1 for f, _ in tracked if watched(f))
+          print(f"Coverage: {n} tracked in watched areas, {len(bad)} uncovered, watched: {watch or 'none'}")
           PY
           if [ -s /tmp/uncovered.txt ]; then echo "uncovered=yes" >> "$GITHUB_OUTPUT"; else echo "uncovered=no" >> "$GITHUB_OUTPUT"; fi
 
@@ -148,6 +155,9 @@ jobs:
     needs: build
     if: needs.build.outputs.mode == 'live'
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -168,7 +178,7 @@ jobs:
           [ "${{ needs.build.outputs.readfail }}" = "yes" ] && { echo "::error::Pages setting was unreadable, so nothing was deployed. Red means couldn't tell; check the Pages settings and the workflow token."; exit 1; }
           if [ "${{ needs.build.outputs.mode }}" = "live" ] && [ "${{ needs.deploy.result }}" != "success" ]; then echo "::error::live mode but deploy did not succeed"; exit 1; fi
           if [ "${{ needs.build.outputs.uncovered }}" = "yes" ]; then
-            echo "::error::A routine wrote a file the allowlist doesn't account for. Add it to .pages-allow (published) or as a ! line (not published)."
+            echo "::error::A tracked file in a watched area is on no .pages-allow line, or is a symlink. Add a missing file to .pages-allow (published) or as a ! line (not published), in its own PR; replace a symlink with a regular file."
             exit 1
           fi
           echo "OK"

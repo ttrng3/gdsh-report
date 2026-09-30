@@ -1,8 +1,10 @@
 # Files GitHub Pages publishes. Nothing else in this repo is served.
-# Line types:  path or glob = published (a * never crosses a /; a glob must
+# Line types:  path or glob = published (a line containing *, ? or [ is a
+# glob; a * never crosses a / and never matches a leading dot; a glob must
 # match a file) · !path = known, deliberately not published · @prefix/ = a
-# watched area: every file a writer changes under it must match a line
-# above, or the Pages run fails "UNCOVERED".
+# watched area: every tracked file under it must match a line above, or the
+# Pages run fails "UNCOVERED". A symlink anywhere in a listed path, or a
+# tracked symlink in a watched area, is refused.
 # The workflow deploys only once Pages is set to GitHub Actions; until then
 # every run is a dry run that stages and checks but publishes nothing.
 # Writers: the weekly routine and publish.yml (monthly, 17th) both write
