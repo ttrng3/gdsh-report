@@ -5,7 +5,7 @@ Status: approved by Ty 30/09 via claude-config PRs 12 and 14 (specs: claude-conf
 42/42 Linux tests at e914738).
 
 ## Change
-`.github/workflows/pages.yml` becomes the template at e914738 minus the optional placeholder comment, with gdsh-report's own workflow_run trigger kept in its place. Nothing else changes.
+`.github/workflows/pages.yml` becomes the template at e914738 minus the optional placeholder comment, with gdsh-report's own workflow_run trigger kept in its place. `.pages-allow` gains a two-line header pointer to these rules. Nothing else changes.
 
 ## Behaviour changes
 - Only simple sets (`[abc]`, `[!x]`, `[^x]`; no set inside a set, no `/` inside a set) are allowed in `.pages-allow`; any other `[` or `]` stops the deploy.
