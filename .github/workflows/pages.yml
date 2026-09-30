@@ -13,8 +13,15 @@
 # Dry run: unless the Pages setting reads build_type == workflow, nothing is
 # deployed. A failed read never deploys either, and it turns the run RED
 # (couldn't tell), while a read of 'legacy' is a green dry run.
-# Fails closed: a missing path, an empty glob, an escaping path or a symlink
-# anywhere in a listed path stops the deploy, and the live site stays as it was.
+# Fails closed, and the live site stays as it was, on any of:
+#   - a missing path, or a glob that matches nothing
+#   - a path that escapes the repo, or a symlink anywhere in a listed path
+#   - a backslash on any line
+#   - a [ ] form other than a simple set ([abc], [!x], [^x]; no set inside a
+#     set, no / inside a set)
+#   - any wildcard on an @ line (a watched area is a plain path)
+#   - an allowlist that lists nothing to publish
+# In a simple set, [^x] and [!x] both mean "not x" in both steps.
 name: Pages (allowlist)
 
 on:
@@ -81,6 +88,13 @@ jobs:
             path="${line%%#*}"
             path="${path#"${path%%[![:space:]]*}"}"; path="${path%"${path##*[![:space:]]}"}"
             [ -z "$path" ] && continue
+            case "$path" in *\\*) echo "::error::refusing a backslash in .pages-allow (bash and the coverage check read escapes differently; use a ? or * glob instead): $path"; exit 1;; esac
+            # one pass, never repeated, so removing a set can't join its neighbours into a new one;
+            # a leading ! or ^ is always negation and needs at least one member; a / is never a member;
+            # # is the delimiter because comments are already stripped, so no # reaches this line
+            rest="$(printf '%s' "$path" | sed -E 's#\[([!^][^][/]+|[^][!^/][^][/]*)\]##g')"
+            case "$rest" in *[][]*) echo "::error::refusing a [ ] form other than a simple set like [abc], [!x] or [^x] (no set inside a set, no / inside a set; the coverage check reads other forms differently): $path"; exit 1;; esac
+            case "$path" in @*[\*\?\[]*) echo "::error::refusing a wildcard on an @ line (a watched area is a plain path, not a glob): $path"; exit 1;; esac
             case "$path" in !*|@*) continue;; esac
             case "$path" in /*|*..*) echo "::error::refusing path outside the repo: $path"; exit 1;; esac
             if [[ "$path" == *[\*\?\[]* ]]; then
@@ -119,6 +133,7 @@ jobs:
               else: pub.append(s)
           def seg(name, pat):  # bash staging runs with dotglob off: * never matches a leading dot
               if name.startswith(".") and not pat.startswith("."): return False
+              pat = pat.replace("[^", "[!")   # Stage allows only simple sets, so every [^ opens one
               return fnmatch.fnmatchcase(name, pat)
           def match(f, pat):   # * never crosses a /
               a, b = f.split("/"), pat.split("/")

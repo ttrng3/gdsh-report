@@ -10,6 +10,8 @@
 # Writers: the weekly routine and publish.yml (monthly, 17th) both write
 # index.html, history.json, data/index.json and data/.last-check.
 # The pages are fully rendered and fetch nothing at runtime.
+# Only simple [ ] sets ([abc], [!x], [^x]) are allowed, and no wildcard on an @
+# line; pages.yml's header lists everything that stops a deploy.
 index.html
 brief/index.html
 review/index.html
