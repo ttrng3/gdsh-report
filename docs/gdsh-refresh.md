@@ -49,6 +49,9 @@ dangerous failure here; the heartbeat makes it visible. The two-clock watchdog
 in `freshness-check.yml` reads it (job ran) separately from
 `data/index.json`'s `generatedUtc` (job published), thresholds 10d / 45d.
 
+This repo is public. The heartbeat names the source by its period and file
+name only: never a Drive file or folder id (ids stay in the routine prompt).
+
 ## data/index.json
 
 A machine-readable sidecar written by `build_auto.py` on every build:
