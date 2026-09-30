@@ -17,4 +17,4 @@ Pre-check, 30/09, on this repo's main before the branch: `git ls-files -s -z` (e
 - Permissions: workflow `contents: read`; build `contents: read` + `pages: read`; deploy `pages: write` + `id-token: write`. Proven live on Omni-TMDV 30/09.
 
 ## Pass condition (after merge)
-The first run shows `mode: live` with configure-pages, upload and deploy green, and every served file byte-identical to the pre-merge baseline posted on the PR (path + sha256 of each served file, fetched from the live site just before the PR was opened). If a routine commit lands between the baseline and that run, a changed file is compared with its copy at the deployed commit instead. A failure reverts this PR.
+The first run shows `mode: live` with configure-pages, upload and deploy green, and every served file byte-identical to the pre-merge baseline posted on the PR (one line per served file: path, HTTP status, first 12 hex characters of its sha256; fetched from the live site just before the PR was opened). If a routine commit lands between the baseline and that run, a changed file is compared with its copy at the deployed commit instead. A failure reverts this PR.
