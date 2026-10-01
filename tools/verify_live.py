@@ -21,15 +21,16 @@ PRIVATE = ["README.md", "CLAUDE.md", "REVIEW.md", "SETUP_AUTONOMY.md", "docs/gds
            "data/index.json", "data/.last-check", "judgment/judgment.html", "review/src/B.html", "build_auto.py",
            "tools/build_review.py", "tools/verify_live.py", "verification/report-pages.md",
            ".github/scripts/freshness.py", ".pages-allow"]
-# Storage links, full email addresses, and bare handles ("name@" with no domain).
-TRACES = re.compile(r"/personal/|sharepoint\.com|1drv\.ms|[\w.-]+@\.\.\.iam\.gserviceaccount\.com|"
+# Storage links, full email addresses, and bare handles (a word followed by an at-sign and no domain).
+TRACES = re.compile(r"/personal(?=/)|sharepoint\.com|1drv\.ms|[\w.-]+@\.\.\.iam\.gserviceaccount\.com|"
                     r"[\w.+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}|\b[a-z][a-z0-9._-]{2,}@(?![\w-])", re.I)
 # Not people: GitHub's own commit address, the service-account placeholder in SETUP_AUTONOMY.md,
 # and the generator's @UPPER_CASE@ template markers.
 BENIGN = re.compile(r"users\.noreply\.github\.com$|\.\.\.iam\.gserviceaccount\.com$|^[A-Z0-9_]+@$")
 EXPECTED_CHARTS = 9  # <svg> count of a full build on 01/10 (period 08/2026); change it with the generator
-DRIVE_ID = re.compile(r"\b1[A-Za-z0-9_-]{32}\b")  # runbook "The heartbeat": never a Drive file or folder id
-DRIVE = re.compile(r"(?:drive|docs)\.google\.com/|\b1[A-Za-z0-9_-]{32}\b")  # Drive links and file/folder ids
+DRIVE_ID = re.compile(r"(?<![A-Za-z0-9_-])(?:1[A-Za-z0-9_-]{32}(?:[A-Za-z0-9_-]{11})?|0B[A-Za-z0-9_-]{26})(?![A-Za-z0-9_-])")  # runbook "The heartbeat": never a Drive file or folder id
+DRIVE = re.compile(r"(?:drive|docs)\.google\.com/|(?<![A-Za-z0-9_-])(?:1[A-Za-z0-9_-]{32}(?:[A-Za-z0-9_-]{11})?|0B[A-Za-z0-9_-]{26})(?![A-Za-z0-9_-])")
+PREVIEW_TAG = re.compile(r"(?<![\w-])\d{10}-[0-9a-f]{4}(?![\w-])")  # a Cowork preview version tag  # Drive links and file/folder ids
 PLACEHOLDER = re.compile(r"\{[a-z_][a-z0-9_]*\}")  # a judgment-layer {placeholder} the build did not fill
 HEARTBEAT_MAX = 9  # the watchdog pipeline-wiring's collect_status.py sets for this pipeline
 DATA_MAX = 45      # MAX_DATA_AGE_DAYS default in .github/scripts/freshness.py (monthly source)
@@ -102,13 +103,13 @@ def main():
         last_key = list(series)[-1] if series else ""
         v["period_consistent"] = (bool(clock.get("asof")) and clock["asof"] in pages["index.html"] and
                                   f"{month:02d}.{str(clock['period']).split('/')[1]}" in pages["index.html"] and
-                                  (last_key == f"T{month}" or f"T{month}" in series))  # January: see Traps
+                                  (last_key == f"T{month}" or (month == 1 and "T1" in series)))  # January: see Traps
         info["period"] = {"clock": clock.get("period"), "history_last": last_key}
     except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
         clock, v["period_consistent"] = {}, False
 
     # Past months of the cumulative series never change: compare with the previous commit that touched it.
-    # HEAD covers a working-tree edit; the commit before covers a run that already landed.
+    # The last two commits that changed history.json: the newest covers a working-tree edit, the one before it a run that already landed.
     try:
         prev = git("log", "-2", "--first-parent", "--format=%H", "--", "history.json").split()
         now = json.loads((ROOT / "history.json").read_text(encoding="utf-8")).get("pnl_cum", {})
@@ -135,7 +136,7 @@ def main():
         tracked = []
     info["tracked_files"] = len(tracked)
     for p in tracked:
-        if p in SERVED or p in ("tools/verify_live.py", "verification/report-pages.md"):
+        if p in SERVED:
             continue
         try:
             texts[f"main:{p}"] = (ROOT / p).read_text(encoding="utf-8")
@@ -150,6 +151,8 @@ def main():
     served_texts = [t for k, t in texts.items() if k.split(":", 1)[1] in SERVED]
     info["drive_ids_tracked"] = {k: len(DRIVE_ID.findall(t)) for k, t in texts.items() if DRIVE_ID.search(t)}
     v["no_drive_ids_tracked"] = not info["drive_ids_tracked"]
+    info["preview_tags_tracked"] = {k: len(PREVIEW_TAG.findall(t)) for k, t in texts.items() if PREVIEW_TAG.search(t)}
+    v["no_preview_tags_tracked"] = not info["preview_tags_tracked"]
     info["drive_refs_served"] = sum(len(DRIVE.findall(t)) for t in served_texts)
     v["no_drive_refs_served"] = info["drive_refs_served"] == 0
     info["forbid_checked"] = len(forbid)
