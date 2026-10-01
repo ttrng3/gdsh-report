@@ -13,14 +13,14 @@ Run after a weekly check (the GDSH routine's cron, `0 1 * * 1` UTC = 08:00 Monda
 
 ## Steps
 
-1. **Repo and live site.** `python3 tools/verify_live.py --forbid <words>` → exit 0 and `"pass": true`. The words come from the runner's own notes (the other entity's name, any person's handle that leaked before). Names of people are never written into this repo. Without `--forbid` the entity verdict fails on purpose.
+1. **Repo and live site** (on the Mac only; never from the GDSH routine, which must not fetch the live site: runbook "Verifying a run"). `python3 tools/verify_live.py --forbid <words>` → exit 0 and `"pass": true`. The words come from the runner's own notes (the other entity's name, any person's handle that leaked before). Names of people are never written into this repo. Without `--forbid` the entity verdict fails on purpose.
 2. **Pages in Chrome.** Open each of https://ttrng3.github.io/gdsh-report/, `/brief/` and `/review/`. Run the script under Invariants on each. Expected: the page has a title and visible text; the dashboard draws as many `<svg>` charts as its file holds; nothing shows a raw `{placeholder}`.
 3. **Console.** Reload each page, then read errors for `TypeError|ReferenceError|Uncaught|SyntaxError`. Expected: none (the pages carry no script; an error means something injected one).
 4. **Preview.** Get the preview link from the GDSH routine's prompt (`RemoteTrigger get`). Never write it here. `Artifact list` its files and `Artifact read` its page. Expected: the page's sha256 equals `build/artifact.html` built from `main` (`python3 tools/build-fragment.py && shasum -a 256 build/artifact.html`) or from the last commit that changed `index.html` (`git log --first-parent -1 --format=%h -- index.html`). The routine republishes only when `index.html` changed, so an unchanged dashboard leaves the preview as it was.
 
 ## Invariants
 
-Step 1 prints these verdicts, all of which must be true: `served_equals_main`, `private_not_served`, `no_unfilled_placeholders`, `dashboard_has_charts`, `period_consistent` (the clock's `asof` and period appear on the dashboard, and the history's last month is the clock's month), `history_months_kept` (every month in `history.json` at HEAD and at the commit before, except each version's newest month, which a re-run may restate, has the same value now), `heartbeat_fresh` (≤ 9 days, pipeline-wiring's watchdog for this pipeline), `data_fresh` (≤ 45 days, `freshness.py`'s `MAX_DATA_AGE_DAYS` default for this monthly source), `all_tracked_read`, `no_personal_traces`, `no_drive_refs_served`, `no_forbidden_words`.
+Step 1 prints these verdicts, all of which must be true: `served_equals_main`, `private_not_served`, `no_unfilled_placeholders`, `dashboard_has_charts` (exactly `EXPECTED_CHARTS`, 9 on 01/10), `period_consistent` (the clock's `asof` and period appear on the dashboard, and the history's last month is the clock's month), `history_months_kept` (every month in `history.json` at HEAD and at the commit before, except each version's newest month, which a re-run may restate, has the same value now), `heartbeat_fresh` (≤ 9 days, pipeline-wiring's watchdog for this pipeline), `data_fresh` (≤ 45 days, `freshness.py`'s `MAX_DATA_AGE_DAYS` default for this monthly source), `all_tracked_read`, `no_personal_traces`, `no_drive_refs_served`, `no_drive_ids_tracked` (runbook "The heartbeat": never a Drive id in this public repo), `no_forbidden_words`.
 
 Step 2, in each page:
 ```js
@@ -55,11 +55,12 @@ All of them must be true on all three pages.
 
 - Whether the dashboard's figures equal the budget workbook: the workbook needs the Drive fetch (`fetch_latest_budget.py`), which needs secrets the repo does not have (`publish.yml` has never succeeded).
 - Whether every figure in `/brief/` and `/review/` comes from a file in the source folder (the CLAUDE.md rule). They are hand-maintained; a reviewer checks the sources by eye.
-- Drive ids in files that are not served (the heartbeat, SETUP_AUTONOMY.md): known since 30/09, Ty's call.
 
 ## Traps
 
 - Pages answers `cache-control: max-age=600` (10 minutes; response header seen with `curl -sI` on the sister dashboards, 01/10). A `served_equals_main` failure straight after a merge is the cache: wait for the Pages run, then re-run. Each request retries once on a network error or a 5xx.
 - `index.html` is generated. A failing `period_consistent` or `no_unfilled_placeholders` is fixed in `gdsh_render.py`, `build_auto.py` or `judgment/judgment.html`, never in `index.html`.
 - `data/index.json` is a clock, not a data store; the page does not read it. It can be older than the heartbeat by design: the weekly check writes only the heartbeat when no new month exists.
-- `history.json` holds one series (`pnl_cum`) keyed `T<month>`; `period_consistent` relies on that key form.
+- `history.json` holds one series (`pnl_cum`) keyed `T<month>` with no year. In January the key `T1` may sit before `T12` (a rewritten key keeps its old place), so `period_consistent` accepts the month's key anywhere in the series; and if a new year restarts the series, `history_months_kept` will fail that once: check the January publish by hand and re-run.
+- `HEARTBEAT_MAX` is 9 days (pipeline-wiring's watchdog for this weekly check); the runbook's 10 / 45 days are `freshness.py`'s run and data limits. `data_fresh` uses the 45.
+- `git` errors stop the script's git-based verdicts as failures, never as "nothing to check".

@@ -22,10 +22,13 @@ PRIVATE = ["README.md", "CLAUDE.md", "REVIEW.md", "SETUP_AUTONOMY.md", "docs/gds
            "tools/build_review.py", "tools/verify_live.py", "verification/report-pages.md",
            ".github/scripts/freshness.py", ".pages-allow"]
 # Storage links, full email addresses, and bare handles ("name@" with no domain).
-TRACES = re.compile(r"/personal/|sharepoint\.com|1drv\.ms|[\w.+-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}|\b[a-z][a-z0-9._-]{2,}@(?![\w-])", re.I)
+TRACES = re.compile(r"/personal/|sharepoint\.com|1drv\.ms|[\w.-]+@\.\.\.iam\.gserviceaccount\.com|"
+                    r"[\w.+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}|\b[a-z][a-z0-9._-]{2,}@(?![\w-])", re.I)
 # Not people: GitHub's own commit address, the service-account placeholder in SETUP_AUTONOMY.md,
 # and the generator's @UPPER_CASE@ template markers.
-BENIGN = re.compile(r"users\.noreply\.github\.com|\.\.\.iam\.gserviceaccount\.com|^[A-Z_]+@$")
+BENIGN = re.compile(r"users\.noreply\.github\.com$|\.\.\.iam\.gserviceaccount\.com$|^[A-Z0-9_]+@$")
+EXPECTED_CHARTS = 9  # <svg> count of a full build on 01/10 (period 08/2026); change it with the generator
+DRIVE_ID = re.compile(r"\b1[A-Za-z0-9_-]{32}\b")  # runbook "The heartbeat": never a Drive file or folder id
 DRIVE = re.compile(r"(?:drive|docs)\.google\.com/|\b1[A-Za-z0-9_-]{32}\b")  # Drive links and file/folder ids
 PLACEHOLDER = re.compile(r"\{[a-z_][a-z0-9_]*\}")  # a judgment-layer {placeholder} the build did not fill
 HEARTBEAT_MAX = 9  # the watchdog pipeline-wiring's collect_status.py sets for this pipeline
@@ -59,7 +62,8 @@ def norm(t):
 
 
 def git(*args):
-    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True).stdout
+    """Raise on a git failure: an empty answer must never read as "nothing to check"."""
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout
 
 
 def main():
@@ -87,7 +91,8 @@ def main():
     pages = {p: (ROOT / p).read_text(encoding="utf-8") if (ROOT / p).exists() else "" for p in SERVED}
     info["unfilled"] = {p: len(set(PLACEHOLDER.findall(t))) for p, t in pages.items() if PLACEHOLDER.search(t)}
     v["no_unfilled_placeholders"] = not info["unfilled"]
-    v["dashboard_has_charts"] = pages["index.html"].count("<svg") > 0
+    info["dashboard_charts"] = pages["index.html"].count("<svg")
+    v["dashboard_has_charts"] = info["dashboard_charts"] == EXPECTED_CHARTS
 
     # The dashboard's period must agree with the clock file and the history series it was built from.
     try:
@@ -95,23 +100,23 @@ def main():
         series = json.loads((ROOT / "history.json").read_text(encoding="utf-8")).get("pnl_cum", {})
         month = int(str(clock.get("period", "")).split("/")[0])
         last_key = list(series)[-1] if series else ""
-        v["period_consistent"] = (clock.get("asof", "") in pages["index.html"] and
+        v["period_consistent"] = (bool(clock.get("asof")) and clock["asof"] in pages["index.html"] and
                                   f"{month:02d}.{str(clock['period']).split('/')[1]}" in pages["index.html"] and
-                                  last_key == f"T{month}")
+                                  (last_key == f"T{month}" or f"T{month}" in series))  # January: see Traps
         info["period"] = {"clock": clock.get("period"), "history_last": last_key}
     except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
         clock, v["period_consistent"] = {}, False
 
     # Past months of the cumulative series never change: compare with the previous commit that touched it.
     # HEAD covers a working-tree edit; the commit before covers a run that already landed.
-    prev = git("log", "-2", "--first-parent", "--format=%H", "--", "history.json").split()
     try:
+        prev = git("log", "-2", "--first-parent", "--format=%H", "--", "history.json").split()
         now = json.loads((ROOT / "history.json").read_text(encoding="utf-8")).get("pnl_cum", {})
         olds = [json.loads(git("show", f"{c}:history.json")).get("pnl_cum", {}) for c in prev]
         # A re-run of the current month may restate that month, so each old version's newest month is exempt.
-        v["history_months_kept"] = all(now.get(k) == x for old in olds for k, x in list(old.items())[:-1])
+        v["history_months_kept"] = bool(olds) and all(now.get(k) == x for old in olds for k, x in list(old.items())[:-1])
         info["history_commits_compared"] = len(olds)
-    except (OSError, ValueError, AttributeError):
+    except (OSError, ValueError, AttributeError, subprocess.CalledProcessError):
         v["history_months_kept"] = False
 
     beat = ((ROOT / "data/.last-check").read_text(encoding="utf-8").split() or [""])[0] if (ROOT / "data/.last-check").exists() else ""
@@ -124,7 +129,12 @@ def main():
     texts = {f"live:{p}": b.decode("utf-8", "replace") for p, b in live.items()}
     texts.update({f"main:{p}": t for p, t in pages.items()})
     info["unreadable"] = []
-    for p in [x for x in git("ls-files", "-z").split("\0") if x]:
+    try:
+        tracked = [x for x in git("ls-files", "-z").split("\0") if x]
+    except subprocess.CalledProcessError:
+        tracked = []
+    info["tracked_files"] = len(tracked)
+    for p in tracked:
         if p in SERVED or p in ("tools/verify_live.py", "verification/report-pages.md"):
             continue
         try:
@@ -133,12 +143,13 @@ def main():
             pass  # binary file
         except OSError:
             info["unreadable"].append(p)
-    v["all_tracked_read"] = not info["unreadable"]
-    hits = {p: sum(1 for m in TRACES.finditer(t) if not BENIGN.search(m.group(0)) and not BENIGN.search(t[m.start():m.end() + 40]))
-            for p, t in texts.items()}
+    v["all_tracked_read"] = bool(tracked) and not info["unreadable"]
+    hits = {p: sum(1 for m in TRACES.finditer(t) if not BENIGN.search(m.group(0))) for p, t in texts.items()}
     info["traces"] = {p: n for p, n in hits.items() if n}
     v["no_personal_traces"] = not info["traces"]
     served_texts = [t for k, t in texts.items() if k.split(":", 1)[1] in SERVED]
+    info["drive_ids_tracked"] = {k: len(DRIVE_ID.findall(t)) for k, t in texts.items() if DRIVE_ID.search(t)}
+    v["no_drive_ids_tracked"] = not info["drive_ids_tracked"]
     info["drive_refs_served"] = sum(len(DRIVE.findall(t)) for t in served_texts)
     v["no_drive_refs_served"] = info["drive_refs_served"] == 0
     info["forbid_checked"] = len(forbid)
