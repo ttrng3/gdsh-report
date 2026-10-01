@@ -6,6 +6,8 @@ Board brief (BLĐ, 25/09/2026): **https://ttrng3.github.io/gdsh-report/brief/** 
 
 BLĐ report (Bản B, 28/09/2026): **https://ttrng3.github.io/gdsh-report/review/** — built by `tools/build_review.py` from the doc export in `review/src/B.html`; hand-maintained like `brief/`.
 
+TGĐ summary (2 pages, 01/10/2026): **https://ttrng3.github.io/gdsh-report/tom-tat/** — hand-written short version of `/review/`, lives in `tom-tat/`; every figure is taken from `/review/`.
+
 **This repo is the source of truth.** A cloud routine writes `data/` and GitHub
 Pages serves it. `docs/gdsh-refresh.md` is the runbook and outranks the routine
 prompt and any stored memory.
