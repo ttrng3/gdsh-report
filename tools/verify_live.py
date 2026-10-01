@@ -29,8 +29,8 @@ TRACES = re.compile(r"/personal(?=/)|sharepoint\.com|1drv\.ms|[\w.-]+@\.\.\.iam\
 BENIGN = re.compile(r"users\.noreply\.github\.com$|\.\.\.iam\.gserviceaccount\.com$|^[A-Z0-9_]+@$")
 EXPECTED_CHARTS = 9  # <svg> count of a full build on 01/10 (period 08/2026); change it with the generator
 DRIVE_ID = re.compile(r"(?<![A-Za-z0-9_-])(?:1[A-Za-z0-9_-]{32}(?:[A-Za-z0-9_-]{11})?|0B[A-Za-z0-9_-]{26})(?![A-Za-z0-9_-])")  # runbook "The heartbeat": never a Drive file or folder id
-DRIVE = re.compile(r"(?:drive|docs)\.google\.com/|(?<![A-Za-z0-9_-])(?:1[A-Za-z0-9_-]{32}(?:[A-Za-z0-9_-]{11})?|0B[A-Za-z0-9_-]{26})(?![A-Za-z0-9_-])")
-PREVIEW_TAG = re.compile(r"(?<![\w-])\d{10}-[0-9a-f]{4}(?![\w-])")  # a Cowork preview version tag  # Drive links and file/folder ids
+DRIVE = re.compile(r"(?:drive|docs)\.google\.com/|(?<![A-Za-z0-9_-])(?:1[A-Za-z0-9_-]{32}(?:[A-Za-z0-9_-]{11})?|0B[A-Za-z0-9_-]{26})(?![A-Za-z0-9_-])")  # Drive links and file/folder ids
+PREVIEW_TAG = re.compile(r"(?<![\w-])\d{10}-[0-9a-f]{4}(?![\w-])")  # a Cowork preview version tag
 PLACEHOLDER = re.compile(r"\{[a-z_][a-z0-9_]*\}")  # a judgment-layer {placeholder} the build did not fill
 HEARTBEAT_MAX = 9  # the watchdog pipeline-wiring's collect_status.py sets for this pipeline
 DATA_MAX = 45      # MAX_DATA_AGE_DAYS default in .github/scripts/freshness.py (monthly source)
@@ -100,10 +100,12 @@ def main():
         clock = json.loads((ROOT / "data/index.json").read_text(encoding="utf-8"))
         series = json.loads((ROOT / "history.json").read_text(encoding="utf-8")).get("pnl_cum", {})
         month = int(str(clock.get("period", "")).split("/")[0])
-        last_key = list(series)[-1] if series else ""
+        # build_auto.py writes keys in place (T<month>, no year), so the newest month is the largest number, not the last key.
+        newest = max((int(k[1:]) for k in series if re.fullmatch(r"T\d{1,2}", k)), default=None)
         v["period_consistent"] = (bool(clock.get("asof")) and clock["asof"] in pages["index.html"] and
                                   f"{month:02d}.{str(clock['period']).split('/')[1]}" in pages["index.html"] and
-                                  (last_key == f"T{month}" or (month == 1 and "T1" in series)))  # January: see Traps
+                                  newest == month)
+        last_key = f"T{newest}" if newest else ""
         info["period"] = {"clock": clock.get("period"), "history_last": last_key}
     except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
         clock, v["period_consistent"] = {}, False
@@ -114,8 +116,11 @@ def main():
         prev = git("log", "-2", "--first-parent", "--format=%H", "--", "history.json").split()
         now = json.loads((ROOT / "history.json").read_text(encoding="utf-8")).get("pnl_cum", {})
         olds = [json.loads(git("show", f"{c}:history.json")).get("pnl_cum", {}) for c in prev]
-        # A re-run of the current month may restate that month, so each old version's newest month is exempt.
-        v["history_months_kept"] = bool(olds) and all(now.get(k) == x for old in olds for k, x in list(old.items())[:-1])
+        # Each build writes the current month and restates the month before it (build_auto.py: _tN, _tPrev);
+        # every other month must keep its value.
+        cur = max((int(k[1:]) for k in now if re.fullmatch(r"T\d{1,2}", k)), default=0)
+        may_change = {f"T{cur}", f"T{cur - 1}"}
+        v["history_months_kept"] = bool(olds) and all(now.get(k) == x for old in olds for k, x in old.items() if k not in may_change)
         info["history_commits_compared"] = len(olds)
     except (OSError, ValueError, AttributeError, subprocess.CalledProcessError):
         v["history_months_kept"] = False
