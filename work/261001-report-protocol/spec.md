@@ -1,6 +1,6 @@
 # Spec
 
-Status: awaits Ty's explicit approval of this text (review #8, round 3: the earlier go-ahead predates the spec).
+Status: approved by Ty 01/10 ("approve 8", in chat, after review round 3).
 
 - `verification/report-pages.md`: promise, clean state, 4 steps (script, the three pages in Chrome, console, preview), invariants, adversary, sanctioned substitutes, evidence, not covered, traps.
 - `tools/verify_live.py` (stdlib only, not served): 14 verdicts as JSON, exit 0 only when all pass: live equals `main` for the three served pages; private files exist and 404; no unfilled `{placeholder}`; the dashboard has exactly its 9 charts; the period agrees across the page, the clock file and the history's newest month; history months unchanged across the last two commits that changed `history.json`, except the current month and the one before it (which each build writes); heartbeat (≤ 9 days) and data (≤ 45 days) fresh; every tracked text file read; no personal traces (by count and file; three named non-people allowed); no Drive link or id on a served page; no Drive id (33/44 characters or `0B…`) and no Cowork preview version tag in any tracked file; forbidden words (supplied at run time) absent from served pages.
