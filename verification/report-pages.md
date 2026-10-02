@@ -16,7 +16,7 @@ Run after a weekly check (the GDSH routine's cron, `0 1 * * 1` UTC = 08:00 Monda
 1. **Repo and live site** (on the Mac only; never from the GDSH routine, which must not fetch the live site: runbook "Verifying a run"). `python3 tools/verify_live.py --forbid <words>` → exit 0 and `"pass": true`. The words come from the runner's own notes (the other entity's name, any person's handle that leaked before). Names of people are never written into this repo. Without `--forbid` the entity verdict fails on purpose.
 2. **Pages in Chrome.** Open each of https://ttrng3.github.io/gdsh-report/, `/brief/` and `/review/`. Run the script under Invariants on each. Expected: the page has a title and visible text; the dashboard draws as many `<svg>` charts as its file holds; nothing shows a raw `{placeholder}`.
 3. **Console.** Reload each page, then read errors for `TypeError|ReferenceError|Uncaught|SyntaxError`. Expected: none (the pages carry no script; an error means something injected one).
-4. **Preview.** Get the preview link from the GDSH routine's prompt (`RemoteTrigger get`). Never write it here. `Artifact list` its files and `Artifact read` its page. Expected: the page's sha256 equals `build/artifact.html` built from `main` (`python3 tools/build-fragment.py && shasum -a 256 build/artifact.html`) or from the last commit that changed `index.html` (`git log --first-parent -1 --format=%h -- index.html`). The routine republishes only when `index.html` changed, so an unchanged dashboard leaves the preview as it was.
+4. **Preview.** Get the preview link from the GDSH routine's prompt (`RemoteTrigger get`). Never write it here. `Artifact list` its files and `Artifact read` its page into a file outside the repo (the session's scratch folder), under a neutral name. Build from `main` (`python3 tools/build-fragment.py`), then run `python3 tools/preview_matches.py <saved preview> build/artifact.html`. Expected: exit 0, `"match": true`. The script removes only the publisher's skeleton, pinned by its hash, and requires the rest to equal the build byte for byte. If it fails on `main`'s build, build from the last commit that changed `index.html` (`git log --first-parent -1 --format=%h -- index.html`, in a separate worktree) and run `main`'s script on it: `python3 tools/preview_matches.py <saved preview> <worktree>/build/artifact.html`. Use `main`'s script, because older commits do not have it. The fallback exists because the routine republishes only when `index.html` changed, so an unchanged dashboard leaves the preview as it was.
 
 ## Invariants
 
@@ -49,7 +49,7 @@ All of them must be true on all three pages.
 
 - The JSON from step 1 and the three JSONs from step 2.
 - Screenshots (`save_to_disk: true`): the top of each page.
-- For step 4: the hash read and the hash it matched.
+- For step 4: the JSON `tools/preview_matches.py` printed.
 
 ## Not covered
 
@@ -61,6 +61,7 @@ All of them must be true on all three pages.
 - Pages answers `cache-control: max-age=600` (10 minutes; response header seen with `curl -sI` on the sister dashboards, 01/10). A `served_equals_main` failure straight after a merge is the cache: wait for the Pages run, then re-run. Each request retries once on a network error or a 5xx.
 - `index.html` is generated. A failing `period_consistent` or `no_unfilled_placeholders` is fixed in `gdsh_render.py`, `build_auto.py` or `judgment/judgment.html`, never in `index.html`.
 - `data/index.json` is a clock, not a data store; the page does not read it. It can be older than the heartbeat by design: the weekly check writes only the heartbeat when no new month exists.
+- The preview is published wrapped in a fixed skeleton (`<!doctype html>` … `<body>` and `</body></html>`), so its bytes never equal the build's. Step 4 compared whole-page hashes until 2026-10-02 and failed on a correct preview; `tools/preview_matches.py` removes exactly that skeleton (head pinned by sha256, tail exact). If the publisher changes its skeleton, step 4 fails until the pin is updated on purpose.
 - `history.json` holds one series (`pnl_cum`) keyed `T<month>` with no year; `build_auto.py` writes keys in place and its month list runs `range(3, month+1)`, so the generator itself does not handle a new year (in January it would write `T0` and draw no months). Both history verdicts will go red at the first January publish, and stay red until the generator learns the year: that is the signal to fix `build_auto.py`, not the protocol (follow-up, 01/10).
 - `HEARTBEAT_MAX` is 9 days (pipeline-wiring's watchdog for this weekly check); the runbook's 10 / 45 days are `freshness.py`'s run and data limits. `data_fresh` uses the 45.
 - `git` errors stop the script's git-based verdicts as failures, never as "nothing to check".
