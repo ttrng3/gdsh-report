@@ -88,7 +88,7 @@ breakeven = opex_kh/cm
 be_mult   = breakeven/dt_kh
 be_mult_a = breakeven/dt_lk
 surge_need= (dt_kh-dt_lk)/_left
-surge_x   = surge_need/dt_t08
+surge_x   = surge_need/dt_t08 if _mm < 12 else None   # December: no months remain, nothing uses it
 dt_pct    = dt_lk/dt_kh*100
 cf_pct    = H['cf_lk']/H['cf_kh']*100
 
@@ -145,7 +145,7 @@ hist["pnl_cum"][_key(_mm)]=int(net_lk)
 json.dump(hist,open(HIST_PATH,"w",encoding="utf-8"),ensure_ascii=False,indent=1)
 _months=range(_start,_mm+1)
 act_cum=[(f"T{m}",hist["pnl_cum"][_key(m)]) for m in _months if _key(m) in hist["pnl_cum"]]
-E=H["plan_t3k_net"]; n=len(act_cum)
+E=H["plan_t3k_net"]
 plan_cum=[(lab, E*(int(lab[1:])-_start+1)/(_mm-_start+1)) for lab,_ in act_cum]   # by month number, so a skipped month leaves no gap in the plan
 c5=line2(act_cum, plan_cum)
 
@@ -174,7 +174,7 @@ c8=loss_bars([_scenario(l) for l in J["scenarios"].splitlines() if l.strip()])
 _summer = _P("Trại hè")
 PLACEHOLDERS = dict(
     dt_pct=pctv(dt_pct), cf_lk=vnd(H['cf_lk']), cf_lk_abs=bn(abs(H['cf_lk'])).replace(".", ","),
-    cf_pct=d0(cf_pct), months=_mm-_start+1, surge_x=mult(surge_x), surge_need_tr=thou(surge_need/1e6),
+    cf_pct=d0(cf_pct), months=_mm-_start+1, surge_x=mult(surge_x) if _mm < 12 else None, surge_need_tr=thou(surge_need/1e6),
     t08_tr=d0(dt_t08/1e6), tN=_tN, mm=_mm, be_mult=mult(be_mult), capex_lk=vnd(H['capex_lk']),
     net_kh_1=d1(net_kh/1e9).replace("-", "−"),
     summer_share=d0(_summer["rev_lk"]/dt_lk*100),
