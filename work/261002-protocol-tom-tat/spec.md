@@ -1,6 +1,6 @@
 # Spec
 
-Status: as asked by Ty 02/10.
+Status: approved by Ty 02/10 ("approve", in chat).
 
 - `tools/verify_live.py`: `tom-tat/index.html` joins `SERVED`, so the live page must equal main and is checked for unfilled placeholders, Drive references and forbidden words like the other three.
 - `verification/report-pages.md`: the promise, step 2, Evidence and Not covered name `/tom-tat/`.
