@@ -174,7 +174,7 @@ c8=loss_bars([_scenario(l) for l in J["scenarios"].splitlines() if l.strip()])
 _summer = _P("Trại hè")
 PLACEHOLDERS = dict(
     dt_pct=pctv(dt_pct), cf_lk=vnd(H['cf_lk']), cf_lk_abs=bn(abs(H['cf_lk'])).replace(".", ","),
-    cf_pct=d0(cf_pct), months=_mm-_start+1, surge_x=mult(surge_x) if _mm < 12 else "", surge_need_tr=thou(surge_need/1e6),
+    cf_pct=d0(cf_pct), months=_mm-_start+1,
     t08_tr=d0(dt_t08/1e6), tN=_tN, mm=_mm, be_mult=mult(be_mult), capex_lk=vnd(H['capex_lk']),
     net_kh_1=d1(net_kh/1e9).replace("-", "−"),
     summer_share=d0(_summer["rev_lk"]/dt_lk*100),
@@ -183,8 +183,8 @@ PLACEHOLDERS = dict(
     ns_kh_share=pctv(_ns["kh"]/opex_kh*100), ns_lk_share=pctv(_ns["lk"]/opex_lk*100),
     payroll_rev_pct=d0(_ns["kh"]/dt_kh*100), rev_per_wage=d1(dt_lk/_ns["lk"]*100),
 )
-if _mm == 12:   # no months remain: a December judgment that still quotes the surge stops the build (unknown placeholder)
-    del PLACEHOLDERS["surge_x"], PLACEHOLDERS["surge_need_tr"]
+if _mm < 12:    # December has no months left: a judgment that still quotes the surge stops the build (unknown placeholder)
+    PLACEHOLDERS.update(surge_x=mult(surge_x), surge_need_tr=thou(surge_need/1e6))
 def jblock(name): return J[name].format_map(PLACEHOLDERS)
 
 # ---------- KPI ----------
