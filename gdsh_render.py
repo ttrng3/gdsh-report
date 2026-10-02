@@ -210,7 +210,7 @@ def line2(actual, plan, w=980, h=420, unit="tỷ",
 def vbars(rows, w=760, h=300, unit="", note=""):
     # rows: (label, value, color)
     pad_t=34; pad_b=64; plot_h=h-pad_t-pad_b
-    mx=max(v for _,v,_ in rows)*1.16
+    mx=max(v for _,v,_ in rows)*1.16 or 1   # a lone bar of 0 (December) must not divide by zero
     n=len(rows); gw=w/n; bw=min(120, gw*0.5)
     s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
     for i,(lab,v,col) in enumerate(rows):
