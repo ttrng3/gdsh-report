@@ -1,6 +1,8 @@
 # Spec: year-rollover
 
-**Intent:** accepted 2026-10-02 · **Status:** draft
+**Approved:** 2026-10-02 (Ty, in chat; December folded in at the same time)
+
+**Intent:** accepted 2026-10-02 · **Status:** approved
 
 ## Requirements
 1. A build for a period in a new year starts a fresh series at T1 for that year, against that year's budget (intent, answer 1).
@@ -9,6 +11,7 @@
 4. A build for the current period (08/2026) produces an `index.html` byte-identical to today's (intent, Outcome).
 5. `verify_live.py`'s `period_consistent` and `history_months_kept` handle the new format and the new year, in the same PR. The Traps line about January leaves `verification/report-pages.md` (Ty's flag 2).
 6. Nothing merges while the Monday 08:00 run is due (Ty's flag 3).
+7. When no months remain (period 12), the run-rate card reads "Đã hết năm ngân sách" instead of a per-month need (Ty, 2026-10-02).
 
 ## Ty's three flags
 
@@ -34,6 +37,7 @@ All in `build_auto.py`, unless noted:
 - **Keys.** `_yy` = the period's year. History keys are `f"{_yy}-{_mm:02d}"`. The chart labels and the `{tN}` placeholder stay `T<month>`, which is what keeps today's page byte-identical.
 - **Months drawn.** Start = 3 when `_yy == 2026`, otherwise 1. The months drawn are `range(start, _mm+1)` in the period's year only, and the chart points are labelled `T<n>` from the month number.
 - **The month before.** It is written only when `_mm > 1`. In January the workbook's "lũy kế tháng trước" belongs to the new budget year, so nothing is written to the old year's December.
+- **December.** Card 6 draws only the actual run-rate bar, and its note and tag read "Đã hết năm ngân sách"; no "T13" anywhere.
 - **`months` placeholder.** It becomes the count of months drawn. For 2026 this equals today's `_mm - 2`.
 - **`gdsh_render.line2`.** A one-point series (January) would divide by zero (`step = plot_w/(n-1)`). With one point, the point is centred. Any series of two or more points draws exactly as today.
 - **`tools/verify_live.py`.** The two verdicts as in flag 2.
@@ -49,7 +53,7 @@ Loaded: kernel "standing-instructions.md", repo `CLAUDE.md`, the artifact-mirror
 | Repo CLAUDE.md: writers of `history.json` are the routine and `publish.yml` | The PR edits `history.json` once, by hand, for the migration | Ty's ship of the PR authorises it; the check proves no value moved |
 | Artifact-mirror contract | `index.html` is unchanged for 08/2026, so the preview needs no republish from this PR | No conflict |
 | Ty's flag 3, merge window | The routine runs Mon 5 Oct 08:00 Hanoi | Ship after that run lands (above) |
-| **Year end, 12/2026 (question)** | Built in January 2027, the run-rate card would read "Cần T13–T12" (`build_auto.py:151`), and the needed-per-month figure divides by `max(12-_mm,1)`. That's a December bug, not a key bug | **Ty:** fold a December label fix into this PR, or a separate follow-up before the 12/2026 build (mid-January 2027)? Recommendation: separate. It needs wording for "no months left", and that's a judgment call, not a key change |
+| Year end, 12/2026 | The run-rate card would read "Cần T13–T12" | Resolved by Ty 2026-10-02: folded in (requirement 7) |
 | Judgment layer for 01/2027 | `judgment/judgment.html` prose is written per period by the reviewer | Out of scope; the reviewer updates it as every month |
 
 ## Security (secure-pages, 2026-10-02)
@@ -71,13 +75,13 @@ All of this runs on the branch, in temp copies, never on `main`'s data. The inpu
    - Pass: the build exits 0.
    - Every `2026-*` value is unchanged, `2027-01` is added, and no `T0` or `2026-12` key is written.
    - Chart 5 draws exactly one actual point, labelled `T1`, and `{months}` = 1.
-3. **February 2027.** Run on the January output. Pass: two points, `T1` and `T2`, and the 2026 values are still unchanged.
-4. **The checks.** `verify_live.py` on the branch: `period_consistent` and `history_months_kept` are true, reading the pre-migration commits through the legacy map. In a throwaway worktree, a commit that changes one 2026 value makes `history_months_kept` false.
-5. **After merge.** Reviewer before Ty's ship; the verifier on `main` after the ship and the Pages run.
+3. **December 2026.** `GDSH_PERIOD=12/2026` in a tmp copy. Pass: the page shows "Đã hết năm ngân sách" and no "T13".
+4. **February 2027.** Run on the January output. Pass: two points, `T1` and `T2`, and the 2026 values are still unchanged.
+5. **The checks.** `verify_live.py` on the branch: `period_consistent` and `history_months_kept` are true, reading the pre-migration commits through the legacy map. In a throwaway worktree, a commit that changes one 2026 value makes `history_months_kept` false.
+6. **After merge.** Reviewer before Ty's ship; the verifier on `main` after the ship and the Pages run.
 
 The proof is measured on the branch before the PR is called ready; the verifier runs on the merge date.
 
 ## Out of scope
 - Whether a 2027 workbook parses. `gdsh_extract.py` reads fixed 2026 columns ("NGÂN SÁCH T03-08", "Lũy kế 31/07"), and its guard stops the build on a layout it doesn't know. Assumption: the 2027 workbook will need its own extract change once it exists. This PR proves the generator's year logic using 2026 figures relabelled 01/2027.
-- The December label (question above, unless Ty folds it in).
 - Judgment prose, `/brief/`, `/review/`, `/tom-tat/`.
