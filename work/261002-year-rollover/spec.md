@@ -40,6 +40,7 @@ All in `build_auto.py`, unless noted:
 - **December.** Card 6 draws only the actual run-rate bar, and its note and tag read "Đã hết năm ngân sách"; no "T13" anywhere.
   - Added after review, 2026-10-02, recorded here so the spec matches the diff: in December the surge KPI also reads "Đã hết năm ngân sách", card 6's subtitle drops "needed", and `{surge_x}` / `{surge_need_tr}` are not provided, so a December judgment that still quotes the surge stops the build as an unknown placeholder does. November's label reads "Cần T12".
   - Card 8's title and the P&L table header take the period's year instead of a literal 2026.
+  - `docs/gdsh-refresh.md` gains the December step: delete the two surge placeholders from the judgment before the 12/YYYY build. `{months}` counts the points chart 5 draws (`act_cum`), so a skipped month is not counted.
 - **`months` placeholder.** It becomes the count of months drawn. For 2026 this equals today's `_mm - 2`.
 - **`gdsh_render.line2`.** A one-point series (January) would divide by zero (`step = plot_w/(n-1)`). With one point, the point is centred. Any series of two or more points draws exactly as today.
 - **`tools/verify_live.py`.** The two verdicts as in flag 2.

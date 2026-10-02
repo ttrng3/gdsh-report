@@ -174,7 +174,7 @@ c8=loss_bars([_scenario(l) for l in J["scenarios"].splitlines() if l.strip()])
 _summer = _P("Trại hè")
 PLACEHOLDERS = dict(
     dt_pct=pctv(dt_pct), cf_lk=vnd(H['cf_lk']), cf_lk_abs=bn(abs(H['cf_lk'])).replace(".", ","),
-    cf_pct=d0(cf_pct), months=len(_months), surge_x=mult(surge_x), surge_need_tr=thou(surge_need/1e6),
+    cf_pct=d0(cf_pct), months=len(act_cum), surge_x=mult(surge_x), surge_need_tr=thou(surge_need/1e6),
     t08_tr=d0(dt_t08/1e6), tN=_tN, mm=_mm, be_mult=mult(be_mult), capex_lk=vnd(H['capex_lk']),
     net_kh_1=d1(net_kh/1e9).replace("-", "−"),
     summer_share=d0(_summer["rev_lk"]/dt_lk*100),

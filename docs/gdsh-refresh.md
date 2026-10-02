@@ -155,6 +155,10 @@ chart beside it. An unknown placeholder or a missing block stops the build.
 
 After a new period is published (the 17th run, or by hand):
 
+**Before the 12/YYYY period is built** (from mid-November): delete `{surge_x}` and
+`{surge_need_tr}` from `judgment/judgment.html`. In December no months remain, so the
+build does not provide them, and a judgment that still quotes them stops the build.
+
 1. Open `judgment/judgment.html` and read each block against the new page.
    The numbers inside the prose have already moved; the *argument* has not.
 2. Rewrite what the new numbers no longer support. The literal figures that
