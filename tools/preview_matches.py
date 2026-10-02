@@ -12,6 +12,7 @@ this fails until the pin is updated on purpose. Prints JSON; exit 0 only on a ma
 import hashlib, json, pathlib, sys
 
 SKELETON_HEAD_SHA256 = "65aeed0fe57327ab5aa05983225a4a29182a3b56007728748fc02df09a0df9b3"  # the 537-byte head, <!doctype html> through "<body>\\n"
+ROOT = pathlib.Path(__file__).resolve().parent.parent
 HEAD_END = b"<body>\n"
 TAIL = b"\n</body></html>"
 
@@ -20,7 +21,7 @@ def main():
     if len(sys.argv) not in (2, 3):
         sys.exit(__doc__)
     preview = pathlib.Path(sys.argv[1]).read_bytes()
-    build = pathlib.Path(sys.argv[2] if len(sys.argv) == 3 else "build/artifact.html").read_bytes()
+    build = pathlib.Path(sys.argv[2] if len(sys.argv) == 3 else ROOT / "build/artifact.html").read_bytes()
     cut = preview.find(HEAD_END)
     head = preview[:cut + len(HEAD_END)] if cut >= 0 else b""
     out = {"skeleton_head_pinned": bool(head) and hashlib.sha256(head).hexdigest() == SKELETON_HEAD_SHA256,
