@@ -182,13 +182,14 @@ def line2(actual, plan, w=980, h=420, unit="tỷ",
     pad_l=66; pad_r=22; pad_t=44; pad_b=60
     plot_w=w-pad_l-pad_r; plot_h=h-pad_t-pad_b
     mx=max(max(abs(v) for _,v in actual), max(abs(v) for _,v in plan))*1.1
-    n=len(actual); step=plot_w/(n-1)
+    n=len(actual); step=plot_w/(n-1) if n > 1 else 0
     s=[f'<svg viewBox="0 0 {w} {h}" role="img" style="width:100%;height:auto">']
     for i in range(6):
         val=mx/5*i; y=pad_t+val/mx*plot_h
         s.append(f'<line x1="{pad_l}" y1="{y:.1f}" x2="{w-pad_r}" y2="{y:.1f}" stroke="{RULE}"/>')
         s.append(f'<text x="{pad_l-8}" y="{y+4:.1f}" text-anchor="end" font-size="13" fill="{MUT}" style="font-variant-numeric:tabular-nums">-{val/1e9:.0f}</text>')
-    def pts(series): return [(pad_l+i*step, pad_t+abs(v)/mx*plot_h) for i,(_,v) in enumerate(series)]
+    x0=pad_l if n > 1 else pad_l+plot_w/2   # one point (January): centred
+    def pts(series): return [(x0+i*step, pad_t+abs(v)/mx*plot_h) for i,(_,v) in enumerate(series)]
     pa=pts(actual); pp=pts(plan)
     dp="M"+" L".join(f"{x:.1f},{y:.1f}" for x,y in pp)
     s.append(f'<path d="{dp}" fill="none" stroke="{PLAN}" stroke-width="2.6" stroke-dasharray="7 5"/>')

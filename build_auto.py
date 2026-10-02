@@ -68,7 +68,9 @@ PERIOD = os.environ.get("GDSH_PERIOD")
 if not PERIOD:
     m = re.search(r'(\d{2})[.\-_](\d{4})', os.path.basename(xlsx or ""))
     PERIOD = f"{m.group(1)}/{m.group(2)}" if m else "08/2026"
-_mm = int(PERIOD.split("/")[0]); _tN = f"T{_mm}"; _tPrev = f"T{_mm-1}"
+_mm = int(PERIOD.split("/")[0]); _tN = f"T{_mm}"
+_yy = int(PERIOD.split("/")[1]); _start = 3 if _yy == 2026 else 1   # 2026 began in March; every later year starts in January
+_key = lambda m: f"{_yy}-{m:02d}"      # history.json key, e.g. 2026-08
 _endday = (datetime.date(int(PERIOD.split('/')[1]), _mm, 1) + datetime.timedelta(days=32)).replace(day=1) - datetime.timedelta(days=1)
 ASOF = _endday.strftime("%d/%m/%Y")     # ví dụ 31/08/2026
 _left = max(12 - _mm, 1)                # số tháng còn lại trong năm
@@ -135,21 +137,26 @@ except Exception:
     hist={}
 hist.setdefault("pnl_cum",{})
 # seed các tháng lịch sử nếu file trống (giá trị đã kiểm chứng tới 08/2026)
-for k,v in {"T3":-434948164,"T4":-956038009,"T5":-1582632204,"T6":-2630990305}.items():
+for k,v in {"2026-03":-434948164,"2026-04":-956038009,"2026-05":-1582632204,"2026-06":-2630990305}.items():
     hist["pnl_cum"].setdefault(k,v)
-hist["pnl_cum"][_tPrev]=int(H["lk31_07_net"])
-hist["pnl_cum"][_tN]=int(net_lk)
+if _mm > 1:                            # in January the month before is last budget year's: never written
+    hist["pnl_cum"][_key(_mm-1)]=int(H["lk31_07_net"])
+hist["pnl_cum"][_key(_mm)]=int(net_lk)
 json.dump(hist,open(HIST_PATH,"w",encoding="utf-8"),ensure_ascii=False,indent=1)
-_months=[f"T{n}" for n in range(3,_mm+1)]
-act_cum=[(m,hist["pnl_cum"][m]) for m in _months if m in hist["pnl_cum"]]
+_months=range(_start,_mm+1)
+act_cum=[(f"T{m}",hist["pnl_cum"][_key(m)]) for m in _months if _key(m) in hist["pnl_cum"]]
 E=H["plan_t3k_net"]; n=len(act_cum)
 plan_cum=[(act_cum[i][0], E*(i+1)/n) for i in range(n)]
 c5=line2(act_cum, plan_cum)
 
 # ---------- #6 run-rate ----------
-c6=vbars([(f"Run-rate {_tN}|Thực hiện · Actual", round(dt_t08/1e6), ACT),
-          (f"Cần T{_mm+1}–T12|đạt KH · to hit budget", round(surge_need/1e6), PLAN)],
-         note=f"ĐVT: triệu/tháng · gap {mult(surge_x)}")
+_YEAR_DONE = "Đã hết năm ngân sách"   # December: no months remain, so no per-month need
+if _mm < 12:
+    c6=vbars([(f"Run-rate {_tN}|Thực hiện · Actual", round(dt_t08/1e6), ACT),
+              (f"Cần T{_mm+1}–T12|đạt KH · to hit budget", round(surge_need/1e6), PLAN)],
+             note=f"ĐVT: triệu/tháng · gap {mult(surge_x)}")
+else:
+    c6=vbars([(f"Run-rate {_tN}|Thực hiện · Actual", round(dt_t08/1e6), ACT)], note=f"ĐVT: triệu/tháng · {_YEAR_DONE}")
 
 # ---------- #7 hòa vốn ----------
 c7=vbars([(f"Thực thu {ASOF[:5]}|Actual", round(dt_lk/1e9,2), ACT),
@@ -167,7 +174,7 @@ c8=loss_bars([_scenario(l) for l in J["scenarios"].splitlines() if l.strip()])
 _summer = _P("Trại hè")
 PLACEHOLDERS = dict(
     dt_pct=pctv(dt_pct), cf_lk=vnd(H['cf_lk']), cf_lk_abs=bn(abs(H['cf_lk'])).replace(".", ","),
-    cf_pct=d0(cf_pct), months=_mm-2, surge_x=mult(surge_x), surge_need_tr=thou(surge_need/1e6),
+    cf_pct=d0(cf_pct), months=len(_months), surge_x=mult(surge_x), surge_need_tr=thou(surge_need/1e6),
     t08_tr=d0(dt_t08/1e6), tN=_tN, mm=_mm, be_mult=mult(be_mult), capex_lk=vnd(H['capex_lk']),
     net_kh_1=d1(net_kh/1e9).replace("-", "−"),
     summer_share=d0(_summer["rev_lk"]/dt_lk*100),
@@ -225,7 +232,7 @@ Nguồn / Source: Tờ trình KHKD 27/05/2026 + Báo cáo sử dụng ngân sác
 {card("5 · Lỗ P&L lũy kế: Kế hoạch vs Thực hiện / Cumulative P&L loss",f"Lỗ thực {vnd(net_lk)} so mốc ngân sách {vnd(E)} — đọc cùng doanh thu và chi phí đều dưới kế hoạch. Đường đỏ (thực) so đường xanh đứt (kế hoạch phân bổ đều) từng tháng.",c5)}
 
 <div class="two">
-{card("6 · Run-rate doanh thu / Revenue run-rate: needed vs actual",f"Doanh thu/tháng cần cho các tháng cuối năm để đạt kế hoạch, so với doanh thu thực {_tN}.",c6+f'<div class="note crit"><b>{mult(surge_x)} so với con số nào:</b> {_tN} chỉ thu <b>{d0(dt_t08/1e6)} triệu</b> (run-rate hiện tại, từ cột tháng đó của file ngân sách). Để đạt kế hoạch doanh thu năm, phần còn lại phải thu (chia đều) <b>{d0(surge_need/1e6)} triệu/tháng</b>. Chia ra: {d0(surge_need/1e6)} ÷ {d0(dt_t08/1e6)} = <b>{mult(surge_x)}</b> — phải nhân doanh thu tháng lên gần {d0(surge_x)} lần, ngay và giữ suốt. Chưa có hợp đồng/đăng ký nào làm bằng cho cú nhảy này.</div>',tag=mult(surge_x))}
+{card("6 · Run-rate doanh thu / Revenue run-rate: needed vs actual",f"Doanh thu/tháng cần cho các tháng cuối năm để đạt kế hoạch, so với doanh thu thực {_tN}.",(c6+f'<div class="note crit"><b>{mult(surge_x)} so với con số nào:</b> {_tN} chỉ thu <b>{d0(dt_t08/1e6)} triệu</b> (run-rate hiện tại, từ cột tháng đó của file ngân sách). Để đạt kế hoạch doanh thu năm, phần còn lại phải thu (chia đều) <b>{d0(surge_need/1e6)} triệu/tháng</b>. Chia ra: {d0(surge_need/1e6)} ÷ {d0(dt_t08/1e6)} = <b>{mult(surge_x)}</b> — phải nhân doanh thu tháng lên gần {d0(surge_x)} lần, ngay và giữ suốt. Chưa có hợp đồng/đăng ký nào làm bằng cho cú nhảy này.</div>' if _mm < 12 else c6+f'<div class="note"><b>{_YEAR_DONE}.</b></div>'),tag=(mult(surge_x) if _mm < 12 else _YEAR_DONE))}
 {card("7 · Điểm hòa vốn / Breakeven: Actual vs Budget vs Breakeven","Ba mốc doanh thu: thực thu, kế hoạch năm, và mức phải đạt để hòa vốn (không còn lỗ).",c7+f'<div class="note crit"><b>{mult(be_mult)} so với con số nào:</b> điểm hòa vốn = tổng OPEX {vnd(opex_kh)} ÷ biên đóng góp {pctv(cm*100)} ≈ <b>{vnd(breakeven)}</b>. So kế hoạch doanh thu năm {vnd(dt_kh)} → <b>{mult(be_mult)}</b>; so thực thu {vnd(dt_lk)} → <b>{d0(be_mult_a)}×</b>. Nghĩa là ngay cả khi đạt 100% kế hoạch, đơn vị VẪN lỗ — muốn hết lỗ phải có doanh thu gấp {d1(be_mult)} lần chính kế hoạch. Biên đóng góp {pctv(cm*100)} = biên gộp kế hoạch ({vnd(gp_kh)} ÷ {vnd(dt_kh)}); giả định toàn bộ OPEX là chi phí cố định.</div>',tag="Cấu trúc")}
 </div>
 
