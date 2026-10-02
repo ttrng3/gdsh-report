@@ -25,7 +25,9 @@ def main():
     head = preview[:cut + len(HEAD_END)] if cut >= 0 else b""
     out = {"skeleton_head_pinned": bool(head) and hashlib.sha256(head).hexdigest() == SKELETON_HEAD_SHA256,
            "skeleton_tail_exact": preview.endswith(TAIL)}
-    frag = preview[len(head):len(preview) - len(TAIL)] if out["skeleton_head_pinned"] and out["skeleton_tail_exact"] else None
+    # Head and tail must not overlap, and an empty build proves nothing.
+    whole = out["skeleton_head_pinned"] and out["skeleton_tail_exact"] and len(preview) >= len(head) + len(TAIL)
+    frag = preview[len(head):len(preview) - len(TAIL)] if whole and build else None
     if frag is not None:
         out.update(fragment_bytes=len(frag), build_bytes=len(build),
                    fragment_sha256=hashlib.sha256(frag).hexdigest(), build_sha256=hashlib.sha256(build).hexdigest())
