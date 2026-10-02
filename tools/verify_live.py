@@ -15,7 +15,7 @@ import argparse, datetime as dt, glob, hashlib, json, pathlib, re, subprocess, s
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LIVE = "https://ttrng3.github.io/gdsh-report/"
-SERVED = ["index.html", "brief/index.html", "review/index.html"]  # .pages-allow
+SERVED = ["index.html", "brief/index.html", "review/index.html", "tom-tat/index.html"]  # .pages-allow
 # Tracked but never served; each must exist on main and answer 404 live.
 PRIVATE = ["README.md", "CLAUDE.md", "REVIEW.md", "SETUP_AUTONOMY.md", "docs/gdsh-refresh.md", "history.json",
            "data/index.json", "data/.last-check", "judgment/judgment.html", "review/src/B.html", "build_auto.py",
