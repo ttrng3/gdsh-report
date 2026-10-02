@@ -147,7 +147,7 @@ The page has two layers, and they live in two places.
 the workflow on changes the numbers and nothing else.
 
 Judgment prose quotes live numbers through `{placeholders}` (`{dt_pct}`,
-`{surge_x}`, `{cf_lk}` …, listed at the top of the file and in `PLACEHOLDERS`
+`{surge_x}` (not in December; see below), `{cf_lk}` …, listed at the top of the file and in `PLACEHOLDERS`
 in `build_auto.py`), so a figure in the verdict can never disagree with the
 chart beside it. An unknown placeholder or a missing block stops the build.
 
