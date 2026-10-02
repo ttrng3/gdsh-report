@@ -154,9 +154,11 @@ chart beside it. An unknown placeholder or a missing block stops the build.
 ### What the reviewer does each month
 
 **After the 11/YYYY page is published (mid-December) and before the 12/YYYY build
-(January):** delete `{surge_x}` and `{surge_need_tr}` from `judgment/judgment.html`.
-In December no months remain, so the build does not provide them, and a judgment that
-still quotes them stops the build. Both are provided again from the 01 period.
+(January):** rewrite or remove every sentence in `judgment/judgment.html` that quotes
+`{surge_x}` or `{surge_need_tr}`; deleting only the placeholder leaves the claim without
+its number. In December no months remain, so the build does not provide them, and a
+judgment that still quotes them stops the build. When the 01/YYYY judgment is reviewed,
+put the surge sentences back if they are still wanted: both are provided again from then.
 
 After a new period is published (the 17th run, or by hand):
 
