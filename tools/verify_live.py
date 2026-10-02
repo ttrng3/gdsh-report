@@ -19,7 +19,7 @@ SERVED = ["index.html", "brief/index.html", "review/index.html"]  # .pages-allow
 # Tracked but never served; each must exist on main and answer 404 live.
 PRIVATE = ["README.md", "CLAUDE.md", "REVIEW.md", "SETUP_AUTONOMY.md", "docs/gdsh-refresh.md", "history.json",
            "data/index.json", "data/.last-check", "judgment/judgment.html", "review/src/B.html", "build_auto.py",
-           "tools/build_review.py", "tools/verify_live.py", "verification/report-pages.md",
+           "tools/build_review.py", "tools/verify_live.py", "tools/preview_matches.py", "verification/report-pages.md",
            ".github/scripts/freshness.py", ".pages-allow"]
 # Storage links, full email addresses, and bare handles (a word followed by an at-sign and no domain).
 TRACES = re.compile(r"/personal(?=/)|sharepoint\.com|1drv\.ms|[\w.-]+@\.\.\.iam\.gserviceaccount\.com|"
