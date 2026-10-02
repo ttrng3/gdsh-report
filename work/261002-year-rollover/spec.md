@@ -16,7 +16,10 @@
 ## Ty's three flags
 
 **1. Does the key format change? Yes.** The keys go from `T<month>` to `YYYY-MM`, for example `T8` becomes `2026-08`. The year has to be in the key: otherwise `T1` of 2027 and the never-drawn months of later years collide with 2026's keys. A sorted key also gives the newest month directly.
-- **Migration.** The PR rewrites `history.json` once: `T3…T8` become `2026-03…2026-08`, and every value stays the same. The PR carries a one-off check (run on the branch and printed in the PR body). It maps each old key `T<n>` to `2026-<nn>` and requires the two value sets to be equal key for key.
+- **Migration.** The PR rewrites `history.json` once: `T3…T8` become `2026-03…2026-08`, and every value stays the same. The check, to re-run after any rebase (it must print `True`):
+  ```
+  python3 -c "import json,subprocess;o=json.loads(subprocess.run(['git','show','origin/main:history.json'],capture_output=True,text=True,check=True).stdout)['pnl_cum'];n=json.load(open('history.json'))['pnl_cum'];print({f'2026-{int(k[1:]):02d}':v for k,v in o.items()}==n)"
+  ``` The PR carries a one-off check (run on the branch and printed in the PR body). It maps each old key `T<n>` to `2026-<nn>` and requires the two value sets to be equal key for key.
 - **The build's seed values.** `build_auto.py`'s four seed values move to the new keys with the same numbers.
 - **No ongoing legacy code in the build.** Only `verify_live.py` reads the old keys, and only from commits made before the migration.
 - **Timing.** The migration is generated from `main`'s `history.json` at merge time. If Monday's run adds `T9` first, the branch is rebased and the check is re-run.

@@ -177,4 +177,7 @@ After a new period is published (the 17th run, or by hand):
 
 Nothing in the workflow edits the judgment file, so if nobody reviews it the
 page keeps last month's argument with this month's numbers — and says so via
-the `review_asof` date.
+the `review_asof` date. December is the exception: a 12/YYYY build stops (KeyError
+on `surge_x` or `surge_need_tr`) while the judgment still quotes the surge, and the
+page stays on the 11/YYYY period. The fix is the step above this list, never
+`build_auto.py`.
