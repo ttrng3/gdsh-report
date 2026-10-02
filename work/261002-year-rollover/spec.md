@@ -38,6 +38,8 @@ All in `build_auto.py`, unless noted:
 - **Months drawn.** Start = 3 when `_yy == 2026`, otherwise 1. The months drawn are `range(start, _mm+1)` in the period's year only, and the chart points are labelled `T<n>` from the month number.
 - **The month before.** It is written only when `_mm > 1`. In January the workbook's "lũy kế tháng trước" belongs to the new budget year, so nothing is written to the old year's December.
 - **December.** Card 6 draws only the actual run-rate bar, and its note and tag read "Đã hết năm ngân sách"; no "T13" anywhere.
+  - Added after review, 2026-10-02, recorded here so the spec matches the diff: in December the surge KPI also reads "Đã hết năm ngân sách", card 6's subtitle drops "needed", and `{surge_x}` / `{surge_need_tr}` are not provided, so a December judgment that still quotes the surge stops the build as an unknown placeholder does. November's label reads "Cần T12".
+  - Card 8's title and the P&L table header take the period's year instead of a literal 2026.
 - **`months` placeholder.** It becomes the count of months drawn. For 2026 this equals today's `_mm - 2`.
 - **`gdsh_render.line2`.** A one-point series (January) would divide by zero (`step = plot_w/(n-1)`). With one point, the point is centred. Any series of two or more points draws exactly as today.
 - **`tools/verify_live.py`.** The two verdicts as in flag 2.
@@ -75,7 +77,7 @@ All of this runs on the branch, in temp copies, never on `main`'s data. The inpu
    - Pass: the build exits 0.
    - Every `2026-*` value is unchanged, `2027-01` is added, and no `T0` or `2026-12` key is written.
    - Chart 5 draws exactly one actual point, labelled `T1`, and `{months}` = 1.
-3. **December 2026.** `GDSH_PERIOD=12/2026` in a tmp copy. Pass: the page shows "Đã hết năm ngân sách" and no "T13".
+3. **December 2026.** `GDSH_PERIOD=12/2026` in a tmp copy. Pass: with today's judgment the build stops on the surge placeholder; with a judgment that does not quote it, the page shows "Đã hết năm ngân sách" and no "T13".
 4. **February 2027.** Run on the January output. Pass: two points, `T1` and `T2`, and the 2026 values are still unchanged.
 5. **The checks.** `verify_live.py` on the branch: `period_consistent` and `history_months_kept` are true, reading the pre-migration commits through the legacy map. In a throwaway worktree, a commit that changes one 2026 value makes `history_months_kept` false.
 6. **After merge.** Reviewer before Ty's ship; the verifier on `main` after the ship and the Pages run.

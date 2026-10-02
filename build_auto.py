@@ -174,7 +174,7 @@ c8=loss_bars([_scenario(l) for l in J["scenarios"].splitlines() if l.strip()])
 _summer = _P("Trại hè")
 PLACEHOLDERS = dict(
     dt_pct=pctv(dt_pct), cf_lk=vnd(H['cf_lk']), cf_lk_abs=bn(abs(H['cf_lk'])).replace(".", ","),
-    cf_pct=d0(cf_pct), months=len(_months), surge_x=(mult(surge_x) if _mm < 12 else _YEAR_DONE), surge_need_tr=(thou(surge_need/1e6) if _mm < 12 else _YEAR_DONE),
+    cf_pct=d0(cf_pct), months=len(_months), surge_x=mult(surge_x), surge_need_tr=thou(surge_need/1e6),
     t08_tr=d0(dt_t08/1e6), tN=_tN, mm=_mm, be_mult=mult(be_mult), capex_lk=vnd(H['capex_lk']),
     net_kh_1=d1(net_kh/1e9).replace("-", "−"),
     summer_share=d0(_summer["rev_lk"]/dt_lk*100),
@@ -183,6 +183,8 @@ PLACEHOLDERS = dict(
     ns_kh_share=pctv(_ns["kh"]/opex_kh*100), ns_lk_share=pctv(_ns["lk"]/opex_lk*100),
     payroll_rev_pct=d0(_ns["kh"]/dt_kh*100), rev_per_wage=d1(dt_lk/_ns["lk"]*100),
 )
+if _mm == 12:   # no months remain: a December judgment that still quotes the surge stops the build (unknown placeholder)
+    del PLACEHOLDERS["surge_x"], PLACEHOLDERS["surge_need_tr"]
 def jblock(name): return J[name].format_map(PLACEHOLDERS)
 
 # ---------- KPI ----------
@@ -236,10 +238,10 @@ Nguồn / Source: Tờ trình KHKD 27/05/2026 + Báo cáo sử dụng ngân sác
 {card("7 · Điểm hòa vốn / Breakeven: Actual vs Budget vs Breakeven","Ba mốc doanh thu: thực thu, kế hoạch năm, và mức phải đạt để hòa vốn (không còn lỗ).",c7+f'<div class="note crit"><b>{mult(be_mult)} so với con số nào:</b> điểm hòa vốn = tổng OPEX {vnd(opex_kh)} ÷ biên đóng góp {pctv(cm*100)} ≈ <b>{vnd(breakeven)}</b>. So kế hoạch doanh thu năm {vnd(dt_kh)} → <b>{mult(be_mult)}</b>; so thực thu {vnd(dt_lk)} → <b>{d0(be_mult_a)}×</b>. Nghĩa là ngay cả khi đạt 100% kế hoạch, đơn vị VẪN lỗ — muốn hết lỗ phải có doanh thu gấp {d1(be_mult)} lần chính kế hoạch. Biên đóng góp {pctv(cm*100)} = biên gộp kế hoạch ({vnd(gp_kh)} ÷ {vnd(dt_kh)}); giả định toàn bộ OPEX là chi phí cố định.</div>',tag="Cấu trúc")}
 </div>
 
-{card("8 · Stress test lỗ CẢ NĂM 2026 / Full-year 2026 loss stress test",jblock("scenario_sub"),c8+f'<div class="note"><b>Ghi chú kỳ:</b> lỗ thực lũy kế ({vnd(net_lk)}) KHÔNG đặt cạnh đây để tránh so lệch kỳ (lũy kế vs cả năm) — nó nằm ở biểu đồ #5. Kịch bản là lớp phán quyết, rà soát thủ công gần nhất {REVIEW_ASOF}.</div>')}
+{card(f"8 · Stress test lỗ CẢ NĂM {_yy} / Full-year {_yy} loss stress test",jblock("scenario_sub"),c8+f'<div class="note"><b>Ghi chú kỳ:</b> lỗ thực lũy kế ({vnd(net_lk)}) KHÔNG đặt cạnh đây để tránh so lệch kỳ (lũy kế vs cả năm) — nó nằm ở biểu đồ #5. Kịch bản là lớp phán quyết, rà soát thủ công gần nhất {REVIEW_ASOF}.</div>')}
 
 {card("Bảng P&L chuẩn hóa / Standardized P&L — Kế hoạch vs Thực hiện", "Số đầy đủ theo đồng (VND); (số trong ngoặc) = âm. Full figures in đồng (VND); (parentheses) = negative.", f'''
-<div style="overflow-x:auto"><table><thead><tr><th>Chỉ tiêu / Metric</th><th class="n">Kế hoạch 2026 / Budget</th><th class="n">TH đến {ASOF} / Actual</th><th class="n">% đạt / of budget</th></tr></thead><tbody>
+<div style="overflow-x:auto"><table><thead><tr><th>Chỉ tiêu / Metric</th><th class="n">Kế hoạch {_yy} / Budget</th><th class="n">TH đến {ASOF} / Actual</th><th class="n">% đạt / of budget</th></tr></thead><tbody>
 <tr><td>Doanh thu / Revenue</td><td class="n">{dong(dt_kh)}</td><td class="n">{dong(dt_lk)}</td><td class="n neg">{pctv(dt_pct)}</td></tr>
 <tr><td>Giá vốn / COGS</td><td class="n">{dong(cogs_kh)}</td><td class="n">{dong(cogs_lk)}</td><td class="n">{pctv(cogs_lk/cogs_kh*100)}</td></tr>
 <tr><td>Lợi nhuận gộp / Gross profit</td><td class="n">{dong(gp_kh)}</td><td class="n neg">{neg_dong(gp_lk)}</td><td class="n neg">biên âm / negative</td></tr>
