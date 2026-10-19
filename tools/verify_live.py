@@ -99,14 +99,13 @@ def main():
     try:
         clock = json.loads((ROOT / "data/index.json").read_text(encoding="utf-8"))
         series = json.loads((ROOT / "history.json").read_text(encoding="utf-8")).get("pnl_cum", {})
-        month = int(str(clock.get("period", "")).split("/")[0])
-        # build_auto.py writes keys in place (T<month>, no year), so the newest month is the largest number, not the last key.
-        newest = max((int(k[1:]) for k in series if re.fullmatch(r"T\d{1,2}", k)), default=None)
+        month, year = (int(x) for x in str(clock.get("period", "")).split("/"))
+        # Keys are YYYY-MM (build_auto.py), so the newest month is the largest key.
+        newest = max((k for k in series if re.fullmatch(r"\d{4}-\d{2}", k)), default="")
         v["period_consistent"] = (bool(clock.get("asof")) and clock["asof"] in pages["index.html"] and
-                                  f"{month:02d}.{str(clock['period']).split('/')[1]}" in pages["index.html"] and
-                                  newest == month)
-        last_key = f"T{newest}" if newest else ""
-        info["period"] = {"clock": clock.get("period"), "history_last": last_key}
+                                  f"{month:02d}.{year}" in pages["index.html"] and
+                                  newest == f"{year}-{month:02d}")
+        info["period"] = {"clock": clock.get("period"), "history_last": newest}
     except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
         clock, v["period_consistent"] = {}, False
 
@@ -115,11 +114,14 @@ def main():
     try:
         prev = git("log", "-2", "--first-parent", "--format=%H", "--", "history.json").split()
         now = json.loads((ROOT / "history.json").read_text(encoding="utf-8")).get("pnl_cum", {})
-        olds = [json.loads(git("show", f"{c}:history.json")).get("pnl_cum", {}) for c in prev]
-        # Each build writes the current month and restates the month before it (build_auto.py: _tN, _tPrev);
+        # Commits before the 2026-10 migration keyed months T<n>; every one of them was a 2026 month.
+        legacy = lambda k: f"2026-{int(k[1:]):02d}" if re.fullmatch(r"T\d{1,2}", k) else k
+        olds = [{legacy(k): x for k, x in json.loads(git("show", f"{c}:history.json")).get("pnl_cum", {}).items()} for c in prev]
+        # Each build writes the current month and, except in January, the month before it (build_auto.py);
         # every other month must keep its value.
-        cur = max((int(k[1:]) for k in now if re.fullmatch(r"T\d{1,2}", k)), default=0)
-        may_change = {f"T{cur}", f"T{cur - 1}"}
+        cur = max((k for k in now if re.fullmatch(r"\d{4}-\d{2}", k)), default="0000-00")
+        y, m = int(cur[:4]), int(cur[5:])
+        may_change = {cur} | ({f"{y}-{m - 1:02d}"} if m > 1 else set())
         v["history_months_kept"] = bool(olds) and all(now.get(k) == x for old in olds for k, x in old.items() if k not in may_change)
         info["history_commits_compared"] = len(olds)
     except (OSError, ValueError, AttributeError, subprocess.CalledProcessError):
